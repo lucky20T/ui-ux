@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula Cards - Futuristic Card Game</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#6e00ff',secondary:'#00e5ff'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Roboto', sans-serif;
+background-color: #050b1f;
+color: #e0e0ff;
+overflow-x: hidden;
+}
+h1, h2, h3, h4, h5, h6 {
+font-family: 'Orbitron', sans-serif;
+}
+.neon-border {
+box-shadow: 0 0 5px #6e00ff, 0 0 10px rgba(110, 0, 255, 0.5);
+}
+.neon-text {
+text-shadow: 0 0 5px #6e00ff, 0 0 10px rgba(110, 0, 255, 0.5);
+}
+.cyan-neon {
+box-shadow: 0 0 5px #00e5ff, 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.cyan-neon-text {
+text-shadow: 0 0 5px #00e5ff, 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.gradient-bg {
+background: linear-gradient(135deg, #050b1f 0%, #0f1631 100%);
+}
+.card-gradient {
+background: linear-gradient(135deg, #1a1a40 0%, #0f1631 100%);
+}
+.hero-gradient {
+background: linear-gradient(135deg, rgba(5, 11, 31, 0.7) 0%, rgba(15, 22, 49, 0.7) 100%);
+}
+.glow-button {
+position: relative;
+z-index: 1;
+overflow: hidden;
+}
+.glow-button::after {
+content: '';
+position: absolute;
+top: -2px;
+left: -2px;
+right: -2px;
+bottom: -2px;
+z-index: -1;
+background: linear-gradient(90deg, #6e00ff, #00e5ff, #6e00ff);
+background-size: 200%;
+border-radius: 10px;
+animation: glowing 3s linear infinite;
+}
+@keyframes glowing {
+0% { background-position: 0%; }
+100% { background-position: 200%; }
+}
+.card {
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+transform: translateY(-5px) scale(1.02);
+box-shadow: 0 0 15px rgba(110, 0, 255, 0.5);
+}
+.game-card {
+transition: transform 0.5s ease, box-shadow 0.5s ease;
+transform-style: preserve-3d;
+}
+.game-card:hover {
+transform: rotateY(10deg) translateY(-10px);
+box-shadow: -10px 10px 20px rgba(0, 229, 255, 0.3);
+}
+.legendary {
+background: linear-gradient(135deg, #ff9d00 0%, #ff6c00 100%);
+}
+.rare {
+background: linear-gradient(135deg, #00a3ff 0%, #0057ff 100%);
+}
+.uncommon {
+background: linear-gradient(135deg, #00ff88 0%, #00a347 100%);
+}
+.common {
+background: linear-gradient(135deg, #a0a0a0 0%, #606060 100%);
+}
+.custom-scrollbar::-webkit-scrollbar {
+width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+background: #0f1631;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+background: #6e00ff;
+border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+background: #8833ff;
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 60px;
+height: 30px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.switch-slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #1a1a40;
+transition: .4s;
+border-radius: 34px;
+}
+.switch-slider:before {
+position: absolute;
+content: "";
+height: 22px;
+width: 22px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .switch-slider {
+background-color: #6e00ff;
+}
+input:checked + .switch-slider:before {
+transform: translateX(30px);
+}
+input[type="range"] {
+-webkit-appearance: none;
+width: 100%;
+height: 6px;
+background: #1a1a40;
+border-radius: 5px;
+outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 18px;
+height: 18px;
+background: #6e00ff;
+border-radius: 50%;
+cursor: pointer;
+box-shadow: 0 0 5px rgba(110, 0, 255, 0.8);
+}
+input[type="range"]::-moz-range-thumb {
+width: 18px;
+height: 18px;
+background: #6e00ff;
+border-radius: 50%;
+cursor: pointer;
+box-shadow: 0 0 5px rgba(110, 0, 255, 0.8);
+border: none;
+}
+.custom-radio {
+display: flex;
+align-items: center;
+position: relative;
+cursor: pointer;
+user-select: none;
+}
+.custom-radio input {
+position: absolute;
+opacity: 0;
+cursor: pointer;
+}
+.radio-mark {
+position: relative;
+height: 20px;
+width: 20px;
+background-color: #1a1a40;
+border-radius: 50%;
+margin-right: 10px;
+}
+.custom-radio:hover .radio-mark {
+background-color: #252550;
+}
+.custom-radio input:checked ~ .radio-mark {
+background-color: #1a1a40;
+border: 2px solid #6e00ff;
+}
+.radio-mark:after {
+content: "";
+position: absolute;
+display: none;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: #6e00ff;
+box-shadow: 0 0 5px rgba(110, 0, 255, 0.8);
+}
+.custom-radio input:checked ~ .radio-mark:after {
+display: block;
+}
+.custom-checkbox {
+display: flex;
+align-items: center;
+position: relative;
+cursor: pointer;
+user-select: none;
+}
+.custom-checkbox input {
+position: absolute;
+opacity: 0;
+cursor: pointer;
+}
+.checkbox-mark {
+position: relative;
+height: 20px;
+width: 20px;
+background-color: #1a1a40;
+border-radius: 4px;
+margin-right: 10px;
+}
+.custom-checkbox:hover .checkbox-mark {
+background-color: #252550;
+}
+.custom-checkbox input:checked ~ .checkbox-mark {
+background-color: #6e00ff;
+}
+.checkbox-mark:after {
+content: "";
+position: absolute;
+display: none;
+left: 7px;
+top: 3px;
+width: 6px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.custom-checkbox input:checked ~ .checkbox-mark:after {
+display: block;
+}
+.parallax-stars {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: url('https://readdy.ai/api/search-image?query=deep%20space%20stars%20with%20small%20glowing%20particles%2C%20cosmic%20dust%2C%20starfield%2C%20dark%20blue%20and%20purple%20nebula%2C%20high%20resolution%20space%20background&width=1920&height=1080&seq=stars1&orientation=landscape') center/cover no-repeat;
+z-index: -1;
+opacity: 0.4;
+}
+.nav-item {
+position: relative;
+}
+.nav-item::after {
+content: '';
+position: absolute;
+width: 0;
+height: 2px;
+bottom: -2px;
+left: 50%;
+background: #6e00ff;
+transition: all 0.3s ease;
+transform: translateX(-50%);
+}
+.nav-item:hover::after, .nav-item.active::after {
+width: 100%;
+}
+.tab-button {
+position: relative;
+overflow: hidden;
+}
+.tab-button::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(110, 0, 255, 0.2), transparent);
+transform: translateX(-100%);
+transition: transform 0.6s ease;
+}
+.tab-button:hover::before {
+transform: translateX(100%);
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+input[type="number"] {
+-moz-appearance: textfield;
+}
+</style>
+</head>
+<body>
+<div class="parallax-stars"></div>
+<header class="w-full bg-opacity-80 backdrop-blur-md bg-gradient-to-r from-[#0a0a20] to-[#141432] border-b border-[#2a2a5a] sticky top-0 z-50">
+<div class="container mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-10 h-10 flex items-center justify-center">
+<i class="ri-gamepad-fill ri-2x text-primary"></i>
+</div>
+<h1 class="text-2xl font-['Pacifico'] text-white neon-text">logo</h1>
+</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a href="#" class="nav-item text-white font-medium text-sm uppercase tracking-wider active">Home</a>
+<a href="game.html" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Game Lobby</a>
+<a href="deck.html" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Deck Builder</a>
+<a href="#" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Leaderboards</a>
+<a href="#" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Profile</a>
+</nav>
+<div class="flex items-center space-x-4">
+<div class="hidden md:flex items-center space-x-1">
+<div class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full">
+<i class="ri-coin-line text-yellow-400"></i>
+</div>
+<span class="text-yellow-400 font-medium">2,450</span>
+</div>
+<div class="relative">
+<button class="flex items-center space-x-2 bg-[#1a1a40] rounded-full py-1 px-3 hover:bg-[#252550] transition-all duration-300">
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20cyberpunk%20character%20portrait%2C%20holographic%20visor%2C%20neon%20lights%2C%20detailed%20face%2C%20sci-fi%2C%20high%20tech%2C%20digital%20art%20style&width=100&height=100&seq=avatar1&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<span class="hidden md:inline text-sm font-medium">NebulaMaster</span>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+<button class="md:hidden w-10 h-10 flex items-center justify-center">
+<i class="ri-menu-line ri-2x"></i>
+</button>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative h-[600px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20sci-fi%20card%20game%20battle%20arena%20with%20holographic%20cards%20floating%20in%20air%2C%20energy%20beams%2C%20digital%20interface%2C%20neon%20lights%2C%20cyberpunk%20style%2C%20dark%20atmosphere%20with%20glowing%20elements%2C%20high%20detail%2C%20cinematic%20lighting&width=1920&height=800&seq=hero1&orientation=landscape" alt="Hero Background" class="w-full h-full object-cover">
+<div class="absolute inset-0 bg-gradient-to-r from-[#050b1f] via-[rgba(5,11,31,0.8)] to-transparent"></div>
+</div>
+<div class="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center">
+<div class="md:w-1/2 text-center md:text-left mb-10 md:mb-0">
+<h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight neon-text">
+Master the Cards.<br>
+<span class="text-primary">Rule the Galaxy.</span>
+</h1>
+<p class="text-lg md:text-xl text-gray-300 mb-8 max-w-lg">
+Enter a universe where strategy meets spectacle. Build powerful decks, challenge players across the cosmos, and rise to legendary status.
+</p>
+<a href="game.html">
+    <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+        <button class="glow-button bg-primary text-white py-3 px-8 rounded-button font-medium text-lg whitespace-nowrap">
+        Play Now
+        </button>
+</a>
+<button class="bg-transparent border-2 border-[#6e00ff] text-white py-3 px-8 rounded-button font-medium hover:bg-[#6e00ff20] transition-all duration-300 whitespace-nowrap">
+Watch Trailer
+</button>
+</div>
+</div>
+<div class="md:w-1/2 relative">
+<div class="relative w-full max-w-md mx-auto transform rotate-6 hover:rotate-0 transition-all duration-700">
+<div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-20 rounded-lg blur-xl"></div>
+<div class="game-card relative bg-[#1a1a40] border border-[#6e00ff50] rounded-lg overflow-hidden">
+<div class="absolute top-2 left-2 bg-[#00000080] px-2 py-1 rounded-full text-xs font-bold text-primary">
+LEGENDARY
+</div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%20cosmic%20warrior%20character%20card%20art%2C%20glowing%20energy%20weapons%2C%20sci-fi%20armor%20with%20neon%20details%2C%20space%20background%20with%20nebula%2C%20high%20detail%20digital%20illustration%2C%20fantasy%20card%20game%20art%20style&width=400&height=550&seq=card1&orientation=portrait" alt="Featured Card" class="w-full h-auto">
+<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#000000] to-transparent p-4">
+<h3 class="text-lg font-bold text-white">Astral Vanguard</h3>
+<div class="flex items-center justify-between mt-2">
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-sword-line text-red-500"></i>
+</div>
+<span>8</span>
+</div>
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-shield-line text-blue-500"></i>
+</div>
+<span>6</span>
+</div>
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-magic-line text-purple-500"></i>
+</div>
+<span>9</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Game Modes Section -->
+<section class="py-16 relative">
+<div class="container mx-auto px-4">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-bold mb-2 cyan-neon-text">Game Modes</h2>
+<p class="text-gray-400 max-w-2xl mx-auto">Choose your battlefield and prove your skills across multiple arenas. Each mode offers unique challenges and rewards.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="card card-gradient rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="h-48 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20arena%20with%20holographic%20displays%2C%20two%20players%20facing%20off%20in%20a%20card%20game%20duel%2C%20energy%20beams%20connecting%20cards%2C%20sci-fi%20environment%2C%20neon%20lighting%2C%20digital%20interface%20elements&width=600&height=400&seq=mode1&orientation=landscape" alt="Ranked Duel" class="w-full h-full object-cover object-top">
+</div>
+<div class="p-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold">Ranked Duel</h3>
+<span class="bg-primary bg-opacity-20 text-primary px-3 py-1 rounded-full text-xs font-medium">1v1</span>
+</div>
+<p class="text-gray-400 mb-4">Challenge opponents in competitive 1v1 matches. Climb the ranks from Bronze to Cosmic Legend.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-time-line text-gray-400"></i>
+</div>
+<span class="text-sm text-gray-400">10-15 min</span>
+</div>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+Play Now
+</button>
+</div>
+</div>
+</div>
+<div class="card card-gradient rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="h-48 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20team%20battle%20arena%2C%20four%20players%20with%20holographic%20cards%2C%20energy%20connections%20between%20team%20members%2C%20sci-fi%20environment%20with%20floating%20platforms%2C%20digital%20scoreboard%2C%20neon%20lighting%20effects&width=600&height=400&seq=mode2&orientation=landscape" alt="Team Battle" class="w-full h-full object-cover object-top">
+</div>
+<div class="p-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold">Team Battle</h3>
+<span class="bg-secondary bg-opacity-20 text-secondary px-3 py-1 rounded-full text-xs font-medium">2v2</span>
+</div>
+<p class="text-gray-400 mb-4">Join forces with an ally to defeat enemy teams. Coordinate strategies and unleash devastating combos.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-time-line text-gray-400"></i>
+</div>
+<span class="text-sm text-gray-400">15-20 min</span>
+</div>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+Find Team
+</button>
+</div>
+</div>
+</div>
+<div class="card card-gradient rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="h-48 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20draft%20tournament%20room%2C%20multiple%20players%20selecting%20cards%20from%20holographic%20displays%2C%20digital%20card%20packs%20opening%20with%20energy%20effects%2C%20sci-fi%20environment%2C%20competitive%20atmosphere%2C%20neon%20lighting&width=600&height=400&seq=mode3&orientation=landscape" alt="Draft Tournament" class="w-full h-full object-cover object-top">
+</div>
+<div class="p-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold">Draft Tournament</h3>
+<span class="bg-[#ff6c00] bg-opacity-20 text-[#ff6c00] px-3 py-1 rounded-full text-xs font-medium">8 Players</span>
+</div>
+<p class="text-gray-400 mb-4">Build your deck as you go in this thrilling format. Draft cards from rotating packs and outplay your opponents.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-time-line text-gray-400"></i>
+</div>
+<span class="text-sm text-gray-400">45-60 min</span>
+</div>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+Join Draft
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Deck Builder Preview Section -->
+<section class="py-16 bg-[#080c1e]">
+<div class="container mx-auto px-4">
+<div class="flex flex-col md:flex-row items-center">
+<div class="md:w-1/2 mb-10 md:mb-0 md:pr-8">
+<h2 class="text-3xl font-bold mb-4 neon-text">Craft Your Perfect Deck</h2>
+<p class="text-gray-300 mb-6">Our intuitive deck builder gives you the tools to create devastating combinations. Browse your collection, analyze card synergies, and build a deck that matches your playstyle.</p>
+<div class="space-y-4 mb-8">
+<div class="flex items-start">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mr-4 mt-1 flex-shrink-0">
+<i class="ri-drag-move-line text-primary"></i>
+</div>
+<div>
+<h3 class="text-lg font-medium mb-1">Drag & Drop Interface</h3>
+<p class="text-gray-400 text-sm">Easily organize your deck with our intuitive drag and drop system.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mr-4 mt-1 flex-shrink-0">
+<i class="ri-bar-chart-grouped-line text-primary"></i>
+</div>
+<div>
+<h3 class="text-lg font-medium mb-1">Real-time Analytics</h3>
+<p class="text-gray-400 text-sm">Track your deck's mana curve, card type distribution, and power metrics.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mr-4 mt-1 flex-shrink-0">
+<i class="ri-share-forward-line text-primary"></i>
+</div>
+<div>
+<h3 class="text-lg font-medium mb-1">Share & Import</h3>
+<p class="text-gray-400 text-sm">Share your creations with friends or import top-performing decks from the community.</p>
+</div>
+</div>
+</div>
+<a href="deck.html" >
+<button class="bg-primary hover:bg-opacity-90 text-white py-3 px-6 rounded-button font-medium transition-all duration-300 whitespace-nowrap">
+Open Deck Builder
+</button>
+</a>
+</div>
+<div class="md:w-1/2">
+<div class="relative">
+<div class="absolute -inset-4 bg-gradient-to-r from-primary to-secondary opacity-20 rounded-lg blur-lg"></div>
+<div class="relative bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="flex items-center justify-between border-b border-[#2a2a5a] p-4">
+<h3 class="font-medium">Cosmic Destroyer Deck</h3>
+<div class="flex items-center space-x-3">
+<button class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full hover:bg-[#252550] transition-all duration-300">
+<i class="ri-save-line text-gray-300"></i>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full hover:bg-[#252550] transition-all duration-300">
+<i class="ri-share-line text-gray-300"></i>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 p-4">
+<div class="bg-[#1a1a40] rounded-md p-4">
+<h4 class="text-sm font-medium mb-3 text-gray-300">Card Collection</h4>
+<div class="flex items-center space-x-2 mb-4">
+<div class="relative flex-grow">
+<input type="text" placeholder="Search cards..." class="w-full bg-[#0f1631] border border-[#2a2a5a] rounded-md py-2 px-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary">
+<div class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+<i class="ri-search-line text-gray-500"></i>
+</div>
+</div>
+<button class="w-8 h-8 flex items-center justify-center bg-[#0f1631] border border-[#2a2a5a] rounded-md hover:bg-[#1a1a40] transition-all duration-300">
+<i class="ri-filter-3-line text-gray-300"></i>
+</button>
+</div>
+<div class="grid grid-cols-3 gap-2 h-64 overflow-y-auto custom-scrollbar">
+<div class="game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%20space%20warrior%20with%20energy%20sword%2C%20sci-fi%20armor%2C%20blue%20glow%20effects%2C%20card%20game%20art%20style%2C%20detailed%20character%20illustration%20on%20dark%20background&width=100&height=120&seq=card2&orientation=portrait" alt="Card" class="w-full h-20 object-cover object-top">
+<div class="p-1 text-center">
+<p class="text-xs font-medium truncate">Nova Blade</p>
+</div>
+</div>
+<div class="game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-legendary"></div>
+<img src="https://readdy.ai/api/search-image?query=cosmic%20entity%20with%20energy%20tentacles%2C%20space%20background%2C%20orange%20and%20gold%20energy%20effects%2C%20card%20game%20art%20style%2C%20detailed%20character%20illustration&width=100&height=120&seq=card3&orientation=portrait" alt="Card" class="w-full h-20 object-cover object-top">
+<div class="p-1 text-center">
+<p class="text-xs font-medium truncate">Void Entity</p>
+</div>
+</div>
+<div class="game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-uncommon"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%20robot%20drone%20with%20glowing%20green%20elements%2C%20mechanical%20details%2C%20sci-fi%20design%2C%20card%20game%20art%20style%2C%20detailed%20illustration&width=100&height=120&seq=card4&orientation=portrait" alt="Card" class="w-full h-20 object-cover object-top">
+<div class="p-1 text-center">
+<p class="text-xs font-medium truncate">Mech Drone</p>
+</div>
+</div>
+<div class="game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-common"></div>
+<img src="https://readdy.ai/api/search-image?query=energy%20shield%20generator%2C%20sci-fi%20technology%2C%20blue%20force%20field%2C%20card%20game%20art%20style%2C%20detailed%20tech%20illustration&width=100&height=120&seq=card5&orientation=portrait" alt="Card" class="w-full h-20 object-cover object-top">
+<div class="p-1 text-center">
+<p class="text-xs font-medium truncate">Shield Gen</p>
+</div>
+</div>
+<div class="game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=space%20sorceress%20with%20purple%20magic%2C%20cosmic%20powers%2C%20glowing%20runes%2C%20card%20game%20art%20style%2C%20detailed%20character%20illustration&width=100&height=120&seq=card6&orientation=portrait" alt="Card" class="w-full h-20 object-cover object-top">
+<div class="p-1 text-center">
+<p class="text-xs font-medium truncate">Astral Mage</p>
+</div>
+</div>
+<div class="game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-uncommon"></div>
+<img src="https://readdy.ai/api/search-image?query=energy%20blast%20spell%2C%20purple%20and%20blue%20magic%20explosion%2C%20power%20surge%2C%20card%20game%20art%20style%2C%20detailed%20spell%20illustration&width=100&height=120&seq=card7&orientation=portrait" alt="Card" class="w-full h-20 object-cover object-top">
+<div class="p-1 text-center">
+<p class="text-xs font-medium truncate">Energy Surge</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[#1a1a40] rounded-md p-4">
+<h4 class="text-sm font-medium mb-3 text-gray-300">Current Deck (18/30)</h4>
+<div class="mb-4 h-40 bg-[#0f1631] border border-dashed border-[#2a2a5a] rounded-md p-3 overflow-y-auto custom-scrollbar">
+<div class="grid grid-cols-4 gap-2">
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-legendary"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cosmic%20warrior%20with%20energy%20armor%2C%20glowing%20weapons%2C%20space%20background%2C%20card%20game%20art%20style%2C%20detailed%20character%20illustration&width=80&height=80&seq=card8&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">2</div>
+</div>
+</div>
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-rare"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=space%20battleship%20with%20energy%20cannons%2C%20sci-fi%20spacecraft%2C%20futuristic%20design%2C%20card%20game%20art%20style%2C%20detailed%20vehicle%20illustration&width=80&height=80&seq=card9&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">3</div>
+</div>
+</div>
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-uncommon"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=energy%20shield%20spell%2C%20protective%20barrier%2C%20blue%20force%20field%2C%20card%20game%20art%20style%2C%20detailed%20spell%20illustration&width=80&height=80&seq=card10&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">2</div>
+</div>
+</div>
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-common"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=space%20trooper%20with%20laser%20rifle%2C%20sci-fi%20soldier%2C%20futuristic%20armor%2C%20card%20game%20art%20style%2C%20detailed%20character%20illustration&width=80&height=80&seq=card11&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">4</div>
+</div>
+</div>
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-rare"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=energy%20blast%20spell%2C%20cosmic%20explosion%2C%20power%20surge%2C%20card%20game%20art%20style%2C%20detailed%20spell%20illustration&width=80&height=80&seq=card12&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">2</div>
+</div>
+</div>
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-legendary"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cosmic%20entity%20with%20energy%20tentacles%2C%20space%20background%2C%20card%20game%20art%20style%2C%20detailed%20character%20illustration&width=80&height=80&seq=card13&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">1</div>
+</div>
+</div>
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-uncommon"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=space%20station%20with%20energy%20core%2C%20sci-fi%20structure%2C%20futuristic%20design%2C%20card%20game%20art%20style%2C%20detailed%20building%20illustration&width=80&height=80&seq=card14&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">2</div>
+</div>
+</div>
+<div class="game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move">
+<div class="h-1 bg-common"></div>
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=repair%20drone%20with%20mechanical%20arms%2C%20sci-fi%20robot%2C%20futuristic%20design%2C%20card%20game%20art%20style%2C%20detailed%20character%20illustration&width=80&height=80&seq=card15&orientation=squarish" alt="Card" class="w-full h-14 object-cover object-top">
+<div class="absolute bottom-0 right-0 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-tl-md text-xs">2</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-xs font-medium mb-2 text-gray-300">Deck Analysis</h4>
+<div class="h-24" id="deckChart"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Leaderboard Preview Section -->
+<section class="py-16 relative">
+<div class="container mx-auto px-4">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-bold mb-2 cyan-neon-text">Top Players</h2>
+<p class="text-gray-400 max-w-2xl mx-auto">The galaxy's finest duelists compete for glory and rewards. Do you have what it takes to join their ranks?</p>
+</div>
+<div class="bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="p-4 border-b border-[#2a2a5a] flex items-center justify-between">
+<h3 class="font-medium">Season 8 Rankings</h3>
+<div class="flex space-x-2">
+<button class="tab-button bg-primary text-white py-1 px-4 rounded-full text-sm whitespace-nowrap">Global</button>
+<button class="tab-button bg-[#1a1a40] text-gray-300 hover:text-white py-1 px-4 rounded-full text-sm transition-all duration-300 whitespace-nowrap">Friends</button>
+<button class="tab-button bg-[#1a1a40] text-gray-300 hover:text-white py-1 px-4 rounded-full text-sm transition-all duration-300 whitespace-nowrap">Regional</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full min-w-[600px]">
+<thead>
+<tr class="bg-[#1a1a40] text-left">
+<th class="py-3 px-4 text-sm font-medium text-gray-300">Rank</th>
+<th class="py-3 px-4 text-sm font-medium text-gray-300">Player</th>
+<th class="py-3 px-4 text-sm font-medium text-gray-300">Rating</th>
+<th class="py-3 px-4 text-sm font-medium text-gray-300">Win Rate</th>
+<th class="py-3 px-4 text-sm font-medium text-gray-300">Favorite Deck</th>
+<th class="py-3 px-4 text-sm font-medium text-gray-300"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-[#2a2a5a]">
+<td class="py-4 px-4">
+<div class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-[#ffd700] to-[#ffb700] rounded-full text-black font-bold text-sm">1</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#ffd700]">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20cyberpunk%20male%20character%20portrait%2C%20holographic%20visor%2C%20neon%20lights%2C%20detailed%20face%2C%20sci-fi%2C%20high%20tech%2C%20digital%20art%20style&width=100&height=100&seq=avatar2&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<div>
+<p class="font-medium">CosmicEmperor</p>
+<p class="text-xs text-gray-400">Cosmic Legend</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium">2,847</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-24 h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 78%"></div>
+</div>
+<span class="text-sm">78%</span>
+</div>
+</td>
+<td class="py-4 px-4 text-sm">Void Dominion</td>
+<td class="py-4 px-4">
+<button class="text-primary hover:text-white transition-all duration-300">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-add-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a]">
+<td class="py-4 px-4">
+<div class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-[#c0c0c0] to-[#a0a0a0] rounded-full text-black font-bold text-sm">2</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#c0c0c0]">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20cyberpunk%20female%20character%20portrait%2C%20holographic%20visor%2C%20neon%20lights%2C%20detailed%20face%2C%20sci-fi%2C%20high%20tech%2C%20digital%20art%20style&width=100&height=100&seq=avatar3&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<div>
+<p class="font-medium">NebulaNinja</p>
+<p class="text-xs text-gray-400">Cosmic Legend</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium">2,791</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-24 h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 75%"></div>
+</div>
+<span class="text-sm">75%</span>
+</div>
+</td>
+<td class="py-4 px-4 text-sm">Astral Assassins</td>
+<td class="py-4 px-4">
+<button class="text-primary hover:text-white transition-all duration-300">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-add-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a]">
+<td class="py-4 px-4">
+<div class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-[#cd7f32] to-[#a05a2c] rounded-full text-black font-bold text-sm">3</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#cd7f32]">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20cyberpunk%20male%20character%20portrait%2C%20holographic%20visor%2C%20neon%20lights%2C%20detailed%20face%2C%20sci-fi%2C%20high%20tech%2C%20digital%20art%20style&width=100&height=100&seq=avatar4&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<div>
+<p class="font-medium">GalacticMage</p>
+<p class="text-xs text-gray-400">Cosmic Legend</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium">2,685</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-24 h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 72%"></div>
+</div>
+<span class="text-sm">72%</span>
+</div>
+</td>
+<td class="py-4 px-4 text-sm">Cosmic Spellweavers</td>
+<td class="py-4 px-4">
+<button class="text-primary hover:text-white transition-all duration-300">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-add-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a]">
+<td class="py-4 px-4">
+<div class="flex items-center justify-center w-8 h-8 bg-[#1a1a40] rounded-full text-white font-bold text-sm">4</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#2a2a5a]">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20cyberpunk%20female%20character%20portrait%2C%20holographic%20visor%2C%20neon%20lights%2C%20detailed%20face%2C%20sci-fi%2C%20high%20tech%2C%20digital%20art%20style&width=100&height=100&seq=avatar5&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<div>
+<p class="font-medium">StarDrifter</p>
+<p class="text-xs text-gray-400">Diamond Elite</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium">2,573</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-24 h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 69%"></div>
+</div>
+<span class="text-sm">69%</span>
+</div>
+</td>
+<td class="py-4 px-4 text-sm">Stellar Vanguard</td>
+<td class="py-4 px-4">
+<button class="text-primary hover:text-white transition-all duration-300">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-add-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr>
+<td class="py-4 px-4">
+<div class="flex items-center justify-center w-8 h-8 bg-[#1a1a40] rounded-full text-white font-bold text-sm">5</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#2a2a5a]">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20cyberpunk%20male%20character%20portrait%2C%20holographic%20visor%2C%20neon%20lights%2C%20detailed%20face%2C%20sci-fi%2C%20high%20tech%2C%20digital%20art%20style&width=100&height=100&seq=avatar6&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<div>
+<p class="font-medium">QuantumKnight</p>
+<p class="text-xs text-gray-400">Diamond Elite</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium">2,498</td>
+<td class="py-4 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-24 h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 67%"></div>
+</div>
+<span class="text-sm">67%</span>
+</div>
+</td>
+<td class="py-4 px-4 text-sm">Mech Dominion</td>
+<td class="py-4 px-4">
+<button class="text-primary hover:text-white transition-all duration-300">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-add-line"></i>
+</div>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-[#2a2a5a] flex justify-center">
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-6 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+View Full Leaderboard
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Call to Action Section -->
+<section class="py-16 relative">
+<div class="absolute inset-0 z-0">
+<img src="https://readdy.ai/api/search-image?query=futuristic%20space%20battle%20arena%20with%20holographic%20interfaces%2C%20energy%20beams%20connecting%20cards%2C%20cosmic%20background%20with%20nebula%20and%20stars%2C%20sci-fi%20environment%2C%20dark%20atmosphere%20with%20glowing%20neon%20elements%2C%20cinematic%20lighting&width=1920&height=600&seq=cta1&orientation=landscape" alt="CTA Background" class="w-full h-full object-cover">
+<div class="absolute inset-0 bg-gradient-to-r from-[#050b1f] via-[rgba(5,11,31,0.9)] to-[rgba(5,11,31,0.7)]"></div>
+</div>
+<div class="container mx-auto px-4 relative z-10">
+<div class="max-w-3xl mx-auto text-center">
+<h2 class="text-3xl md:text-4xl font-bold mb-4 neon-text">Ready to Join the Battle?</h2>
+<p class="text-lg text-gray-300 mb-8">
+Create your account now and receive an exclusive starter pack with rare cards to begin your journey. The galaxy awaits your strategy and skill.
+</p>
+<div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
+<button class="glow-button bg-primary text-white py-3 px-8 rounded-button font-medium text-lg whitespace-nowrap">
+Create Free Account
+</button>
+<button class="bg-transparent border-2 border-[#6e00ff] text-white py-3 px-8 rounded-button font-medium hover:bg-[#6e00ff20] transition-all duration-300 whitespace-nowrap">
+Learn More
+</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+<div class="text-center">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mx-auto mb-3">
+<i class="ri-user-line text-primary text-xl"></i>
+</div>
+<h3 class="text-lg font-medium mb-1">2.5M+</h3>
+<p class="text-sm text-gray-400">Active Players</p>
+</div>
+<div class="text-center">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mx-auto mb-3">
+<i class="ri-gamepad-line text-primary text-xl"></i>
+</div>
+<h3 class="text-lg font-medium mb-1">500K+</h3>
+<p class="text-sm text-gray-400">Daily Matches</p>
+</div>
+<div class="text-center">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mx-auto mb-3">
+<i class="ri-stack-line text-primary text-xl"></i>
+</div>
+<h3 class="text-lg font-medium mb-1">1,200+</h3>
+<p class="text-sm text-gray-400">Unique Cards</p>
+</div>
+<div class="text-center">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mx-auto mb-3">
+<i class="ri-trophy-line text-primary text-xl"></i>
+</div>
+<h3 class="text-lg font-medium mb-1">$250K</h3>
+<p class="text-sm text-gray-400">Tournament Prize Pool</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="py-16 bg-[#080c1e]">
+<div class="container mx-auto px-4">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-bold mb-2 cyan-neon-text">Game Features</h2>
+<p class="text-gray-400 max-w-2xl mx-auto">Explore the cutting-edge features that make Nebula Cards the most immersive card game in the galaxy.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="card p-6 card-gradient rounded-lg border border-[#2a2a5a]">
+<div class="w-14 h-14 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mb-4">
+<i class="ri-vip-crown-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Premium Card Animations</h3>
+<p class="text-gray-400">Experience stunning visual effects with every card played. Legendary cards feature unique animations that bring your battles to life.</p>
+</div>
+<div class="card p-6 card-gradient rounded-lg border border-[#2a2a5a]">
+<div class="w-14 h-14 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mb-4">
+<i class="ri-team-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Guild System</h3>
+<p class="text-gray-400">Form alliances with fellow players, participate in guild wars, and earn exclusive rewards. Climb the guild rankings together.</p>
+</div>
+<div class="card p-6 card-gradient rounded-lg border border-[#2a2a5a]">
+<div class="w-14 h-14 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mb-4">
+<i class="ri-earth-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Cross-Platform Play</h3>
+<p class="text-gray-400">Play seamlessly across PC, mobile, and tablet devices. Your collection and progress sync automatically across all platforms.</p>
+</div>
+<div class="card p-6 card-gradient rounded-lg border border-[#2a2a5a]">
+<div class="w-14 h-14 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mb-4">
+<i class="ri-calendar-event-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Weekly Events</h3>
+<p class="text-gray-400">Participate in rotating weekly events with special rules and unique rewards. Keep your gameplay fresh and exciting.</p>
+</div>
+<div class="card p-6 card-gradient rounded-lg border border-[#2a2a5a]">
+<div class="w-14 h-14 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mb-4">
+<i class="ri-robot-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">AI Training Mode</h3>
+<p class="text-gray-400">Hone your skills against our advanced AI opponents. Practice new strategies and deck builds before taking them online.</p>
+</div>
+<div class="card p-6 card-gradient rounded-lg border border-[#2a2a5a]">
+<div class="w-14 h-14 flex items-center justify-center bg-primary bg-opacity-20 rounded-full mb-4">
+<i class="ri-broadcast-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Spectator Mode</h3>
+<p class="text-gray-400">Watch live matches between top players, learn new strategies, and cheer for your friends as they battle for supremacy.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter Section -->
+<section class="py-16 relative">
+<div class="container mx-auto px-4">
+<div class="max-w-3xl mx-auto bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary opacity-10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+<div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary opacity-10 rounded-full blur-3xl -ml-32 -mb-32"></div>
+<div class="relative z-10 text-center">
+<h2 class="text-2xl font-bold mb-2">Stay in the Loop</h2>
+<p class="text-gray-400 mb-6">Subscribe to our newsletter for updates on new card releases, tournaments, and exclusive offers.</p>
+<div class="flex flex-col sm:flex-row items-center gap-4 max-w-md mx-auto">
+<input type="email" placeholder="Enter your email" class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary">
+<button class="bg-primary hover:bg-opacity-90 text-white py-3 px-6 rounded-button font-medium transition-all duration-300 whitespace-nowrap w-full sm:w-auto">
+Subscribe
+</button>
+</div>
+<p class="text-xs text-gray-500 mt-4">By subscribing, you agree to receive marketing emails. You can unsubscribe at any time.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-[#0a0a20] border-t border-[#2a2a5a] pt-12 pb-6">
+<div class="container mx-auto px-4">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+<div>
+<div class="flex items-center space-x-2 mb-4">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-gamepad-fill text-primary"></i>
+</div>
+<h2 class="text-xl font-['Pacifico'] text-white neon-text">logo</h2>
+</div>
+<p class="text-gray-400 mb-4">The next evolution in digital card games. Build your deck, master your strategy, and conquer the galaxy.</p>
+<div class="flex space-x-4">
+<a href="#" class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full hover:bg-primary transition-all duration-300">
+<i class="ri-twitter-x-line text-white"></i>
+</a>
+<a href="#" class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full hover:bg-primary transition-all duration-300">
+<i class="ri-discord-line text-white"></i>
+</a>
+<a href="#" class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full hover:bg-primary transition-all duration-300">
+<i class="ri-instagram-line text-white"></i>
+</a>
+<a href="#" class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full hover:bg-primary transition-all duration-300">
+<i class="ri-youtube-line text-white"></i>
+</a>
+</div>
+</div>
+<div>
+<h3 class="text-lg font-bold mb-4">Quick Links</h3>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Home</a></li>
+<li><a href="game.html" class="text-gray-400 hover:text-white transition-all duration-300">Game Lobby</a></li>
+<li><a href="deck.html" class="text-gray-400 hover:text-white transition-all duration-300">Deck Builder</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Leaderboards</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Profile</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-lg font-bold mb-4">Support</h3>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">FAQ</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Help Center</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Contact Us</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Bug Reports</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Community Forums</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-lg font-bold mb-4">Legal</h3>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Terms of Service</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Privacy Policy</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">Cookie Policy</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-all duration-300">EULA</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-[#2a2a5a] pt-6 flex flex-col md:flex-row justify-between items-center">
+<p class="text-gray-500 text-sm mb-4 md:mb-0">© 2025 Nebula Cards. All rights reserved.</p>
+<div class="flex items-center space-x-4">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-visa-fill text-gray-400 text-xl"></i>
+</div>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-mastercard-fill text-gray-400 text-xl"></i>
+</div>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-paypal-fill text-gray-400 text-xl"></i>
+</div>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-apple-fill text-gray-400 text-xl"></i>
+</div>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-google-play-fill text-gray-400 text-xl"></i>
+</div>
+</div>
+</div>
+</div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Initialize deck chart
+const deckChart = echarts.init(document.getElementById('deckChart'));
+const option = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.8)',
+textStyle: {
+color: '#1f2937'
+}
+},
+grid: {
+top: 5,
+right: 0,
+bottom: 0,
+left: 0
+},
+xAxis: {
+type: 'category',
+data: ['1', '2', '3', '4', '5', '6', '7+'],
+axisLine: {
+show: false
+},
+axisTick: {
+show: false
+},
+axisLabel: {
+color: '#1f2937',
+fontSize: 8
+}
+},
+yAxis: {
+type: 'value',
+show: false
+},
+series: [
+{
+name: 'Card Count',
+type: 'bar',
+data: [2, 4, 5, 3, 2, 1, 1],
+itemStyle: {
+color: 'rgba(87, 181, 231, 1)',
+borderRadius: 4
+}
+}
+]
+};
+deckChart.setOption(option);
+// Handle window resize for chart
+window.addEventListener('resize', function() {
+deckChart.resize();
+});
+// Game card hover effect
+const gameCards = document.querySelectorAll('.game-card');
+gameCards.forEach(card => {
+card.addEventListener('mouseenter', function() {
+this.style.transform = 'rotateY(10deg) translateY(-10px)';
+this.style.boxShadow = '-10px 10px 20px rgba(0, 229, 255, 0.3)';
+});
+card.addEventListener('mouseleave', function() {
+this.style.transform = '';
+this.style.boxShadow = '';
+});
+});
+});
+</script>
+</body>
+</html>

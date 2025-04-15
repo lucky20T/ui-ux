@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula Cards - Game Lobby</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#6e00ff',secondary:'#00e5ff'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Roboto', sans-serif;
+background-color: #050b1f;
+color: #e0e0ff;
+overflow-x: hidden;
+}
+h1, h2, h3, h4, h5, h6 {
+font-family: 'Orbitron', sans-serif;
+}
+.neon-border {
+box-shadow: 0 0 5px #6e00ff, 0 0 10px rgba(110, 0, 255, 0.5);
+}
+.neon-text {
+text-shadow: 0 0 5px #6e00ff, 0 0 10px rgba(110, 0, 255, 0.5);
+}
+.cyan-neon {
+box-shadow: 0 0 5px #00e5ff, 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.cyan-neon-text {
+text-shadow: 0 0 5px #00e5ff, 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.gradient-bg {
+background: linear-gradient(135deg, #050b1f 0%, #0f1631 100%);
+}
+.card-gradient {
+background: linear-gradient(135deg, #1a1a40 0%, #0f1631 100%);
+}
+.hero-gradient {
+background: linear-gradient(135deg, rgba(5, 11, 31, 0.7) 0%, rgba(15, 22, 49, 0.7) 100%);
+}
+.glow-button {
+position: relative;
+z-index: 1;
+overflow: hidden;
+}
+.glow-button::after {
+content: '';
+position: absolute;
+top: -2px;
+left: -2px;
+right: -2px;
+bottom: -2px;
+z-index: -1;
+background: linear-gradient(90deg, #6e00ff, #00e5ff, #6e00ff);
+background-size: 200%;
+border-radius: 10px;
+animation: glowing 3s linear infinite;
+}
+@keyframes glowing {
+0% { background-position: 0%; }
+100% { background-position: 200%; }
+}
+.card {
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+transform: translateY(-5px) scale(1.02);
+box-shadow: 0 0 15px rgba(110, 0, 255, 0.5);
+}
+.game-room {
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.game-room:hover {
+transform: translateY(-5px);
+box-shadow: 0 0 15px rgba(110, 0, 255, 0.5);
+}
+.custom-scrollbar::-webkit-scrollbar {
+width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+background: #0f1631;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+background: #6e00ff;
+border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+background: #8833ff;
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 60px;
+height: 30px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.switch-slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #1a1a40;
+transition: .4s;
+border-radius: 34px;
+}
+.switch-slider:before {
+position: absolute;
+content: "";
+height: 22px;
+width: 22px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .switch-slider {
+background-color: #6e00ff;
+}
+input:checked + .switch-slider:before {
+transform: translateX(30px);
+}
+.parallax-stars {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: url('https://readdy.ai/api/search-image?query=deep%252520space%252520stars%252520with%252520small%252520glowing%252520particles%25252C%252520cosmic%252520dust%25252C%252520starfield%25252C%252520dark%252520blue%252520and%252520purple%252520nebula%25252C%252520high%252520resolution%252520space%252520background&width=1920&height=1080&seq=stars1&orientation=landscape') center/cover no-repeat;
+z-index: -1;
+opacity: 0.4;
+}
+.nav-item {
+position: relative;
+}
+.nav-item::after {
+content: '';
+position: absolute;
+width: 0;
+height: 2px;
+bottom: -2px;
+left: 50%;
+background: #6e00ff;
+transition: all 0.3s ease;
+transform: translateX(-50%);
+}
+.nav-item:hover::after, .nav-item.active::after {
+width: 100%;
+}
+.tab-button {
+position: relative;
+overflow: hidden;
+}
+.tab-button::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(110, 0, 255, 0.2), transparent);
+transform: translateX(-100%);
+transition: transform 0.6s ease;
+}
+.tab-button:hover::before {
+transform: translateX(100%);
+}
+.status-open {
+background-color: rgba(0, 200, 83, 0.2);
+color: #00c853;
+}
+.status-in-progress {
+background-color: rgba(255, 171, 0, 0.2);
+color: #ffab00;
+}
+.status-full {
+background-color: rgba(255, 82, 82, 0.2);
+color: #ff5252;
+}
+.status-private {
+background-color: rgba(156, 39, 176, 0.2);
+color: #9c27b0;
+}
+.pulse {
+animation: pulse 2s infinite;
+}
+@keyframes pulse {
+0% {
+box-shadow: 0 0 0 0 rgba(110, 0, 255, 0.7);
+}
+70% {
+box-shadow: 0 0 0 10px rgba(110, 0, 255, 0);
+}
+100% {
+box-shadow: 0 0 0 0 rgba(110, 0, 255, 0);
+}
+}
+.floating {
+animation: floating 3s ease-in-out infinite;
+}
+@keyframes floating {
+0% { transform: translateY(0px); }
+50% { transform: translateY(-10px); }
+100% { transform: translateY(0px); }
+}
+.player-online {
+position: relative;
+}
+.player-online::after {
+content: '';
+position: absolute;
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background-color: #00c853;
+bottom: 0;
+right: 0;
+border: 1px solid #050b1f;
+}
+.player-in-game::after {
+background-color: #ffab00;
+}
+.player-away::after {
+background-color: #ff5252;
+}
+.mode-card {
+transition: all 0.3s ease;
+overflow: hidden;
+}
+.mode-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+}
+.mode-card:hover .mode-card-overlay {
+opacity: 1;
+}
+.mode-card-overlay {
+background: linear-gradient(to top, rgba(26, 26, 64, 0.9) 0%, rgba(26, 26, 64, 0.7) 50%, rgba(26, 26, 64, 0) 100%);
+opacity: 0.8;
+transition: opacity 0.3s ease;
+}
+</style>
+</head>
+<body>
+<div class="parallax-stars"></div>
+<header class="w-full bg-opacity-80 backdrop-blur-md bg-gradient-to-r from-[#0a0a20] to-[#141432] border-b border-[#2a2a5a] sticky top-0 z-50">
+<div class="container mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-10 h-10 flex items-center justify-center">
+<i class="ri-gamepad-fill ri-2x text-primary"></i>
+</div>
+<h1 class="text-2xl font-['Pacifico'] text-white neon-text">logo</h1>
+</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a href="home.html" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Home</a>
+<a href="#" class="nav-item text-white font-medium text-sm uppercase tracking-wider active">Game Lobby</a>
+<a href="deck.html" data-readdy="true" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Deck Builder</a>
+<a href="#" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Leaderboards</a>
+<a href="#" data-readdy="true" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Profile</a>
+</nav>
+<div class="flex items-center space-x-4">
+<div class="hidden md:flex items-center space-x-1">
+<div class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full">
+<i class="ri-coin-line text-yellow-400"></i>
+</div>
+<span class="text-yellow-400 font-medium">2,450</span>
+</div>
+<div class="relative">
+<button class="flex items-center space-x-2 bg-[#1a1a40] rounded-full py-1 px-3 hover:bg-[#252550] transition-all duration-300">
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary">
+<img src="https://readdy.ai/api/search-image?query=futuristic%252520cyberpunk%252520character%252520portrait%25252C%252520holographic%252520visor%25252C%252520neon%252520lights%25252C%252520detailed%252520face%25252C%252520sci-fi%25252C%252520high%252520tech%25252C%252520digital%252520art%252520style&width=100&height=100&seq=avatar1&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<span class="hidden md:inline text-sm font-medium">NebulaMaster</span>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+<button class="md:hidden w-10 h-10 flex items-center justify-center">
+<i class="ri-menu-line ri-2x"></i>
+</button>
+</div>
+</div>
+</header>
+<main class="min-h-screen py-6">
+<div class="container mx-auto px-4">
+<!-- Game Mode Highlights -->
+<section class="mb-8">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold neon-text">Featured Game Modes</h2>
+<button class="text-sm text-gray-300 hover:text-white flex items-center space-x-1">
+<span>View All</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-right-line"></i>
+</div>
+</button>
+</div>
+<div class="flex overflow-x-auto space-x-4 pb-4 custom-scrollbar">
+<!-- Mode 1 -->
+<div class="mode-card flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="relative w-full h-full">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520cosmic%2520battle%2520arena%2520with%2520energy%2520fields%2520and%2520holographic%2520displays%252C%2520sci-fi%2520game%2520environment%252C%2520vibrant%2520purple%2520and%2520blue%2520lighting%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=300&height=200&seq=mode1&orientation=landscape" alt="Standard Battle" class="w-full h-full object-cover">
+<div class="mode-card-overlay absolute inset-0 flex flex-col justify-end p-3">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-lg font-bold">Standard Battle</h3>
+<div class="bg-[#1a1a40] rounded-full px-2 py-0.5 text-xs">1v1</div>
+</div>
+<p class="text-xs text-gray-300 mb-2">Classic 1v1 battle with standard rules</p>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>10-15 min</span>
+<span>Most Popular</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mode 2 -->
+<div class="mode-card flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="relative w-full h-full">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520team%2520battle%2520arena%2520with%2520multiple%2520players%252C%2520cosmic%2520energy%2520effects%252C%2520sci-fi%2520environment%2520with%2520team%2520indicators%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=300&height=200&seq=mode2&orientation=landscape" alt="Team Battle" class="w-full h-full object-cover">
+<div class="mode-card-overlay absolute inset-0 flex flex-col justify-end p-3">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-lg font-bold">Team Battle</h3>
+<div class="bg-[#1a1a40] rounded-full px-2 py-0.5 text-xs">2v2</div>
+</div>
+<p class="text-xs text-gray-300 mb-2">Team up and battle with shared resources</p>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>15-20 min</span>
+<span>Team Strategy</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mode 3 -->
+<div class="mode-card flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="relative w-full h-full">
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520draft%2520tournament%2520with%2520card%2520selection%2520interface%252C%2520multiple%2520players%2520choosing%2520cards%252C%2520futuristic%2520holographic%2520displays%252C%2520sci-fi%2520environment%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=300&height=200&seq=mode3&orientation=landscape" alt="Draft Mode" class="w-full h-full object-cover">
+<div class="mode-card-overlay absolute inset-0 flex flex-col justify-end p-3">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-lg font-bold">Draft Mode</h3>
+<div class="bg-[#1a1a40] rounded-full px-2 py-0.5 text-xs">1-8</div>
+</div>
+<p class="text-xs text-gray-300 mb-2">Build your deck as you play from a shared pool</p>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>30-45 min</span>
+<span>Tactical</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mode 4 -->
+<div class="mode-card flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="relative w-full h-full">
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520arena%2520with%2520time%2520distortion%2520effects%252C%2520speed%2520battle%2520with%2520energy%2520trails%252C%2520fast-paced%2520sci-fi%2520environment%252C%2520futuristic%2520timer%2520displays%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=300&height=200&seq=mode4&orientation=landscape" alt="Blitz Mode" class="w-full h-full object-cover">
+<div class="mode-card-overlay absolute inset-0 flex flex-col justify-end p-3">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-lg font-bold">Blitz Mode</h3>
+<div class="bg-[#1a1a40] rounded-full px-2 py-0.5 text-xs">1v1</div>
+</div>
+<p class="text-xs text-gray-300 mb-2">Fast-paced battles with reduced turn time</p>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>5-8 min</span>
+<span>Speed</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mode 5 -->
+<div class="mode-card flex-shrink-0 w-64 h-40 rounded-lg overflow-hidden border border-[#2a2a5a]">
+<div class="relative w-full h-full">
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520tournament%2520arena%2520with%2520multiple%2520battle%2520stations%252C%2520championship%2520brackets%2520displayed%2520as%2520holograms%252C%2520audience%2520viewing%2520areas%252C%2520sci-fi%2520environment%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=300&height=200&seq=mode5&orientation=landscape" alt="Tournament" class="w-full h-full object-cover">
+<div class="mode-card-overlay absolute inset-0 flex flex-col justify-end p-3">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-lg font-bold">Tournament</h3>
+<div class="bg-[#1a1a40] rounded-full px-2 py-0.5 text-xs">8-16</div>
+</div>
+<p class="text-xs text-gray-300 mb-2">Compete in brackets for ultimate glory</p>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>60+ min</span>
+<span>Competitive</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="flex flex-col lg:flex-row gap-6">
+<!-- Game Room List (Main Content) -->
+<div class="lg:w-3/4">
+<!-- Quick Actions Bar -->
+<div class="flex flex-wrap gap-3 mb-6">
+<button class="glow-button bg-primary hover:bg-opacity-90 text-white py-3 px-6 rounded-button font-medium transition-all duration-300 whitespace-nowrap !rounded-button">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>Create Room</span>
+</div>
+</button>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-3 px-6 rounded-button font-medium transition-all duration-300 whitespace-nowrap !rounded-button">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-sword-line"></i>
+</div>
+<span>Quick Match</span>
+</div>
+</button>
+<div class="relative">
+<button id="joinPrivateBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-3 px-6 rounded-button font-medium transition-all duration-300 whitespace-nowrap !rounded-button">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-lock-line"></i>
+</div>
+<span>Join Private Room</span>
+</div>
+</button>
+<div id="privateRoomInput" class="hidden absolute top-full left-0 mt-2 w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-lg p-3 z-10">
+<div class="flex items-center space-x-2">
+<input type="text" placeholder="Enter room code" class="bg-[#0f1631] border border-[#2a2a5a] rounded-button py-2 px-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary flex-grow">
+<button class="bg-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">Join</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-4 mb-6">
+<div class="flex flex-wrap items-center gap-4">
+<div class="relative flex-grow max-w-md">
+<input type="text" placeholder="Search rooms..." class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary">
+<div class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+<i class="ri-search-line text-gray-500"></i>
+</div>
+</div>
+<div class="flex items-center space-x-3">
+<div class="relative">
+<button id="filterModeBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button flex items-center space-x-2">
+<span>Game Mode</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="filterModeDropdown" class="hidden absolute top-full left-0 mt-2 w-48 bg-[#1a1a40] border border-[#2a2a5a] rounded-lg p-2 z-10">
+<div class="space-y-1">
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Standard Battle</span>
+</label>
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Team Battle</span>
+</label>
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Draft Mode</span>
+</label>
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Blitz Mode</span>
+</label>
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Tournament</span>
+</label>
+</div>
+</div>
+</div>
+<div class="relative">
+<button id="filterStatusBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button flex items-center space-x-2">
+<span>Status</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="filterStatusDropdown" class="hidden absolute top-full left-0 mt-2 w-48 bg-[#1a1a40] border border-[#2a2a5a] rounded-lg p-2 z-10">
+<div class="space-y-1">
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Open</span>
+</label>
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">In Progress</span>
+</label>
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Full</span>
+</label>
+<label class="flex items-center space-x-2 p-2 hover:bg-[#252550] rounded cursor-pointer">
+<input type="checkbox" class="form-checkbox h-4 w-4 text-primary rounded border-gray-700 focus:ring-0">
+<span class="text-sm">Private</span>
+</label>
+</div>
+</div>
+</div>
+<div class="relative">
+<button id="sortBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button flex items-center space-x-2">
+<span>Sort: Recent</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="sortDropdown" class="hidden absolute top-full right-0 mt-2 w-48 bg-[#1a1a40] border border-[#2a2a5a] rounded-lg p-2 z-10">
+<div class="space-y-1">
+<button class="w-full text-left p-2 hover:bg-[#252550] rounded text-sm">Recent</button>
+<button class="w-full text-left p-2 hover:bg-[#252550] rounded text-sm">Player Count</button>
+<button class="w-full text-left p-2 hover:bg-[#252550] rounded text-sm">Game Mode</button>
+<button class="w-full text-left p-2 hover:bg-[#252550] rounded text-sm">Host Rating</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Game Room Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+<!-- Room 1 -->
+<div class="game-room bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520battle%2520arena%2520with%2520energy%2520fields%2520and%2520futuristic%2520displays%252C%2520sci-fi%2520game%2520environment%252C%2520purple%2520and%2520blue%2520lighting%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=400&height=150&seq=room1&orientation=landscape" alt="Cosmic Showdown" class="w-full h-32 object-cover">
+<div class="absolute top-2 right-2 status-open text-xs font-medium px-2 py-1 rounded-full">
+Open
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-center mb-2">
+<h3 class="text-lg font-bold">Cosmic Showdown</h3>
+<div class="flex items-center space-x-1">
+<span class="text-sm">2/4</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-6 h-6 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=host1&orientation=squarish" alt="Host" class="w-full h-full object-cover">
+</div>
+<span class="text-sm text-gray-300">AstralVoyager</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-sword-line text-secondary"></i>
+</div>
+<span class="text-sm">Standard Battle</span>
+</div>
+<span class="text-xs text-gray-400">10-15 min</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="text-xs text-gray-400">
+<span>Custom Deck • No Legendaries</span>
+</div>
+<button class="bg-primary hover:bg-opacity-90 text-white py-1.5 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">
+Join
+</button>
+</div>
+</div>
+</div>
+<!-- Room 2 -->
+<div class="game-room bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=team%2520battle%2520arena%2520with%2520multiple%2520players%252C%2520cosmic%2520energy%2520effects%252C%2520sci-fi%2520environment%2520with%2520team%2520indicators%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=400&height=150&seq=room2&orientation=landscape" alt="Galactic Warfare" class="w-full h-32 object-cover">
+<div class="absolute top-2 right-2 status-in-progress text-xs font-medium px-2 py-1 rounded-full">
+In Progress
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-center mb-2">
+<h3 class="text-lg font-bold">Galactic Warfare</h3>
+<div class="flex items-center space-x-1">
+<span class="text-sm">4/4</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-6 h-6 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=host2&orientation=squarish" alt="Host" class="w-full h-full object-cover">
+</div>
+<span class="text-sm text-gray-300">NebulaHunter</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line text-secondary"></i>
+</div>
+<span class="text-sm">Team Battle</span>
+</div>
+<span class="text-xs text-gray-400">15-20 min</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="text-xs text-gray-400">
+<span>Ranked • 2v2 • 5:23 elapsed</span>
+</div>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-1.5 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">
+Spectate
+</button>
+</div>
+</div>
+</div>
+<!-- Room 3 -->
+<div class="game-room bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520draft%2520tournament%2520with%2520card%2520selection%2520interface%252C%2520futuristic%2520holographic%2520displays%252C%2520sci-fi%2520environment%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=400&height=150&seq=room3&orientation=landscape" alt="Stellar Draft" class="w-full h-32 object-cover">
+<div class="absolute top-2 right-2 status-open text-xs font-medium px-2 py-1 rounded-full">
+Open
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-center mb-2">
+<h3 class="text-lg font-bold">Stellar Draft</h3>
+<div class="flex items-center space-x-1">
+<span class="text-sm">3/8</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-6 h-6 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=host3&orientation=squarish" alt="Host" class="w-full h-full object-cover">
+</div>
+<span class="text-sm text-gray-300">CosmicArchitect</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-draft-line text-secondary"></i>
+</div>
+<span class="text-sm">Draft Mode</span>
+</div>
+<span class="text-xs text-gray-400">30-45 min</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="text-xs text-gray-400">
+<span>Casual • All Cards Available</span>
+</div>
+<button class="bg-primary hover:bg-opacity-90 text-white py-1.5 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">
+Join
+</button>
+</div>
+</div>
+</div>
+<!-- Room 4 -->
+<div class="game-room bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520arena%2520with%2520time%2520distortion%2520effects%252C%2520speed%2520battle%2520with%2520energy%2520trails%252C%2520fast-paced%2520sci-fi%2520environment%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=400&height=150&seq=room4&orientation=landscape" alt="Speed Nebula" class="w-full h-32 object-cover">
+<div class="absolute top-2 right-2 status-private text-xs font-medium px-2 py-1 rounded-full">
+Private
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-center mb-2">
+<h3 class="text-lg font-bold">Speed Nebula</h3>
+<div class="flex items-center space-x-1">
+<span class="text-sm">1/2</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-6 h-6 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=host4&orientation=squarish" alt="Host" class="w-full h-full object-cover">
+</div>
+<span class="text-sm text-gray-300">QuantumRacer</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-timer-flash-line text-secondary"></i>
+</div>
+<span class="text-sm">Blitz Mode</span>
+</div>
+<span class="text-xs text-gray-400">5-8 min</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="text-xs text-gray-400">
+<span>Private • Code Required</span>
+</div>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-1.5 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">
+Request
+</button>
+</div>
+</div>
+</div>
+<!-- Room 5 -->
+<div class="game-room bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520tournament%2520arena%2520with%2520championship%2520brackets%2520displayed%2520as%2520holograms%252C%2520audience%2520viewing%2520areas%252C%2520sci-fi%2520environment%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=400&height=150&seq=room5&orientation=landscape" alt="Nova Championship" class="w-full h-32 object-cover">
+<div class="absolute top-2 right-2 status-in-progress text-xs font-medium px-2 py-1 rounded-full">
+In Progress
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-center mb-2">
+<h3 class="text-lg font-bold">Nova Championship</h3>
+<div class="flex items-center space-x-1">
+<span class="text-sm">16/16</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-6 h-6 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=host5&orientation=squarish" alt="Host" class="w-full h-full object-cover">
+</div>
+<span class="text-sm text-gray-300">GalacticModerator</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-trophy-line text-secondary"></i>
+</div>
+<span class="text-sm">Tournament</span>
+</div>
+<span class="text-xs text-gray-400">60+ min</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="text-xs text-gray-400">
+<span>Official • Quarterfinals</span>
+</div>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-1.5 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">
+Spectate
+</button>
+</div>
+</div>
+</div>
+<!-- Room 6 -->
+<div class="game-room bg-[#0f1631] border border-[#2a2a5a] rounded-lg overflow-hidden">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=beginner%2520friendly%2520cosmic%2520battle%2520arena%2520with%2520tutorial%2520elements%252C%2520holographic%2520guides%252C%2520sci-fi%2520training%2520environment%252C%2520digital%2520art%2520style%252C%2520high%2520detail&width=400&height=150&seq=room6&orientation=landscape" alt="Rookie Training" class="w-full h-32 object-cover">
+<div class="absolute top-2 right-2 status-open text-xs font-medium px-2 py-1 rounded-full">
+Open
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-center mb-2">
+<h3 class="text-lg font-bold">Rookie Training</h3>
+<div class="flex items-center space-x-1">
+<span class="text-sm">1/4</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-6 h-6 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=host6&orientation=squarish" alt="Host" class="w-full h-full object-cover">
+</div>
+<span class="text-sm text-gray-300">StarGuide</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-sword-line text-secondary"></i>
+</div>
+<span class="text-sm">Standard Battle</span>
+</div>
+<span class="text-xs text-gray-400">10-15 min</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="text-xs text-gray-400">
+<span>Beginner Friendly • Starter Decks</span>
+</div>
+<button class="bg-primary hover:bg-opacity-90 text-white py-1.5 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">
+Join
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex justify-center items-center space-x-1 mb-6">
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-[#1a1a40] hover:bg-[#252550] transition-all duration-300">
+<i class="ri-arrow-left-s-line"></i>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-primary text-white">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-[#1a1a40] hover:bg-[#252550] transition-all duration-300">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-[#1a1a40] hover:bg-[#252550] transition-all duration-300">3</button>
+<span class="mx-1">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-[#1a1a40] hover:bg-[#252550] transition-all duration-300">8</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-[#1a1a40] hover:bg-[#252550] transition-all duration-300">
+<i class="ri-arrow-right-s-line"></i>
+</button>
+</div>
+</div>
+<!-- Online Players Panel (Sidebar) -->
+<div class="lg:w-1/4">
+<div class="bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-4 mb-6">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold cyan-neon-text">Online Players</h2>
+<div class="flex items-center space-x-1 bg-[#1a1a40] rounded-full px-3 py-1">
+<div class="w-3 h-3 bg-green-500 rounded-full"></div>
+<span class="text-sm">1,247</span>
+</div>
+</div>
+<!-- Friends List -->
+<div class="mb-4">
+<h3 class="text-sm font-medium mb-2 text-gray-300">Friends</h3>
+<div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+<div class="flex items-center justify-between p-2 hover:bg-[#1a1a40] rounded-lg transition-all duration-300">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full overflow-hidden player-online">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=friend1&orientation=squarish" alt="Friend" class="w-full h-full object-cover">
+</div>
+<span class="text-sm">StarDrifter</span>
+</div>
+<div class="flex items-center space-x-1">
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-message-3-line text-xs"></i>
+</button>
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-sword-line text-xs"></i>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-2 hover:bg-[#1a1a40] rounded-lg transition-all duration-300">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full overflow-hidden player-online player-in-game">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=friend2&orientation=squarish" alt="Friend" class="w-full h-full object-cover">
+</div>
+<div>
+<span class="text-sm">NebulaHunter</span>
+<p class="text-xs text-yellow-400">In Game</p>
+</div>
+</div>
+<div class="flex items-center space-x-1">
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-eye-line text-xs"></i>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-2 hover:bg-[#1a1a40] rounded-lg transition-all duration-300">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full overflow-hidden player-online">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=friend3&orientation=squarish" alt="Friend" class="w-full h-full object-cover">
+</div>
+<span class="text-sm">VoidWalker</span>
+</div>
+<div class="flex items-center space-x-1">
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-message-3-line text-xs"></i>
+</button>
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-sword-line text-xs"></i>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-2 hover:bg-[#1a1a40] rounded-lg transition-all duration-300">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full overflow-hidden player-online player-away">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=friend4&orientation=squarish" alt="Friend" class="w-full h-full object-cover">
+</div>
+<div>
+<span class="text-sm">CosmicArchitect</span>
+<p class="text-xs text-red-400">Away</p>
+</div>
+</div>
+<div class="flex items-center space-x-1">
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-message-3-line text-xs"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Players -->
+<div class="mb-4">
+<h3 class="text-sm font-medium mb-2 text-gray-300">Recent Matches</h3>
+<div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+<div class="flex items-center justify-between p-2 hover:bg-[#1a1a40] rounded-lg transition-all duration-300">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=recent1&orientation=squarish" alt="Recent Player" class="w-full h-full object-cover">
+</div>
+<div>
+<span class="text-sm">GalacticEmpress</span>
+<p class="text-xs text-green-400">Victory • 15m ago</p>
+</div>
+</div>
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-sword-line text-xs"></i>
+</button>
+</div>
+<div class="flex items-center justify-between p-2 hover:bg-[#1a1a40] rounded-lg transition-all duration-300">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=recent2&orientation=squarish" alt="Recent Player" class="w-full h-full object-cover">
+</div>
+<div>
+<span class="text-sm">NovaCrusher</span>
+<p class="text-xs text-red-400">Defeat • 45m ago</p>
+</div>
+</div>
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-sword-line text-xs"></i>
+</button>
+</div>
+<div class="flex items-center justify-between p-2 hover:bg-[#1a1a40] rounded-lg transition-all duration-300">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520sci-fi%2520character%2520portrait%252C%2520detailed%2520face%252C%2520cyberpunk%2520style%252C%2520high%2520tech%2520elements&width=50&height=50&seq=recent3&orientation=squarish" alt="Recent Player" class="w-full h-full object-cover">
+</div>
+<div>
+<span class="text-sm">AstralVoyager</span>
+<p class="text-xs text-green-400">Victory • 2h ago</p>
+</div>
+</div>
+<button class="w-7 h-7 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-sword-line text-xs"></i>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Invite -->
+<div>
+<h3 class="text-sm font-medium mb-2 text-gray-300">Quick Invite</h3>
+<div class="bg-[#1a1a40] rounded-lg p-3">
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-20 rounded-full">
+<i class="ri-link text-primary"></i>
+</div>
+<div>
+<h4 class="text-sm font-medium">Share Game Link</h4>
+<p class="text-xs text-gray-400">Invite friends to join your game</p>
+</div>
+</div>
+<div class="flex items-center">
+<input type="text" value="nebula.cards/join/XZ7A9B" class="bg-[#0f1631] border border-[#2a2a5a] rounded-l-button py-2 px-3 text-sm text-white flex-grow focus:outline-none focus:border-primary" readonly>
+<button class="bg-primary hover:bg-opacity-90 text-white py-2 px-3 rounded-r-button text-sm transition-all duration-300 whitespace-nowrap">
+<i class="ri-file-copy-line"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Game Announcements -->
+<div class="bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-4">
+<h2 class="text-xl font-bold cyan-neon-text mb-4">Announcements</h2>
+<div class="space-y-4">
+<div class="bg-[#1a1a40] rounded-lg p-3">
+<div class="flex items-center space-x-2 mb-2">
+<div class="w-8 h-8 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-primary">
+<i class="ri-trophy-line"></i>
+</div>
+<h3 class="text-sm font-bold">Weekend Tournament</h3>
+</div>
+<p class="text-xs text-gray-300 mb-2">Join our Galactic Championship this weekend! Top players will earn exclusive cards and cosmic credits.</p>
+<div class="flex justify-between items-center">
+<span class="text-xs text-gray-400">Starts in 1d 14h</span>
+<button class="text-xs text-primary hover:underline">Details</button>
+</div>
+</div>
+<div class="bg-[#1a1a40] rounded-lg p-3">
+<div class="flex items-center space-x-2 mb-2">
+<div class="w-8 h-8 flex items-center justify-center bg-secondary bg-opacity-20 rounded-full text-secondary">
+<i class="ri-cards-2-line"></i>
+</div>
+<h3 class="text-sm font-bold">New Card Set</h3>
+</div>
+<p class="text-xs text-gray-300 mb-2">The "Cosmic Horizons" expansion is now available! Discover 60 new cards with unique abilities.</p>
+<div class="flex justify-between items-center">
+<span class="text-xs text-gray-400">Released April 10</span>
+<button class="text-xs text-secondary hover:underline">View Cards</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Create Room Modal -->
+<div id="createRoomModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+<div class="bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-6 w-full max-w-md transform transition-all duration-300 scale-95 opacity-0">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold">Create Game Room</h3>
+<button id="closeCreateRoomBtn" class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] hover:bg-[#252550] rounded-full transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="space-y-4">
+<div>
+<label for="roomName" class="block text-sm font-medium text-gray-300 mb-1">Room Name</label>
+<input type="text" id="roomName" class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary" placeholder="Enter room name">
+</div>
+<div>
+<label for="gameMode" class="block text-sm font-medium text-gray-300 mb-1">Game Mode</label>
+<div class="relative">
+<select id="gameMode" class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 pl-4 pr-8 text-white appearance-none focus:outline-none focus:border-primary">
+<option>Standard Battle</option>
+<option>Team Battle</option>
+<option>Draft Mode</option>
+<option>Blitz Mode</option>
+<option>Tournament</option>
+</select>
+<div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</div>
+</div>
+<div>
+<label for="playerCount" class="block text-sm font-medium text-gray-300 mb-1">Player Count</label>
+<div class="relative">
+<select id="playerCount" class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 pl-4 pr-8 text-white appearance-none focus:outline-none focus:border-primary">
+<option>2 Players</option>
+<option>4 Players</option>
+<option>8 Players</option>
+<option>16 Players</option>
+</select>
+<div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-1">Room Settings</label>
+<div class="space-y-2">
+<label class="flex items-center justify-between">
+<span class="text-sm">Private Room</span>
+<label class="custom-switch">
+<input type="checkbox" id="privateRoom">
+<span class="switch-slider"></span>
+</label>
+</label>
+<label class="flex items-center justify-between">
+<span class="text-sm">Ranked Match</span>
+<label class="custom-switch">
+<input type="checkbox" id="rankedMatch">
+<span class="switch-slider"></span>
+</label>
+</label>
+<label class="flex items-center justify-between">
+<span class="text-sm">Allow Spectators</span>
+<label class="custom-switch">
+<input type="checkbox" id="allowSpectators" checked>
+<span class="switch-slider"></span>
+</label>
+</label>
+</div>
+</div>
+<div id="privateCodeSection" class="hidden">
+<label for="privateCode" class="block text-sm font-medium text-gray-300 mb-1">Private Room Code</label>
+<input type="text" id="privateCode" class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary" placeholder="Auto-generated code" value="XZ7A9B" readonly>
+</div>
+</div>
+<div class="flex justify-end space-x-3 mt-6">
+<button id="cancelCreateBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">Cancel</button>
+<button id="confirmCreateBtn" class="bg-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap !rounded-button">Create Room</button>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Toggle private room input
+const joinPrivateBtn = document.getElementById('joinPrivateBtn');
+const privateRoomInput = document.getElementById('privateRoomInput');
+joinPrivateBtn.addEventListener('click', function() {
+privateRoomInput.classList.toggle('hidden');
+});
+// Close private room input when clicking outside
+document.addEventListener('click', function(event) {
+if (!joinPrivateBtn.contains(event.target) && !privateRoomInput.contains(event.target)) {
+privateRoomInput.classList.add('hidden');
+}
+});
+// Filter dropdowns
+const filterModeBtn = document.getElementById('filterModeBtn');
+const filterModeDropdown = document.getElementById('filterModeDropdown');
+const filterStatusBtn = document.getElementById('filterStatusBtn');
+const filterStatusDropdown = document.getElementById('filterStatusDropdown');
+const sortBtn = document.getElementById('sortBtn');
+const sortDropdown = document.getElementById('sortDropdown');
+filterModeBtn.addEventListener('click', function(e) {
+e.stopPropagation();
+filterModeDropdown.classList.toggle('hidden');
+filterStatusDropdown.classList.add('hidden');
+sortDropdown.classList.add('hidden');
+});
+filterStatusBtn.addEventListener('click', function(e) {
+e.stopPropagation();
+filterStatusDropdown.classList.toggle('hidden');
+filterModeDropdown.classList.add('hidden');
+sortDropdown.classList.add('hidden');
+});
+sortBtn.addEventListener('click', function(e) {
+e.stopPropagation();
+sortDropdown.classList.toggle('hidden');
+filterModeDropdown.classList.add('hidden');
+filterStatusDropdown.classList.add('hidden');
+});
+// Close dropdowns when clicking outside
+document.addEventListener('click', function() {
+filterModeDropdown.classList.add('hidden');
+filterStatusDropdown.classList.add('hidden');
+sortDropdown.classList.add('hidden');
+});
+// Prevent dropdown close when clicking inside
+filterModeDropdown.addEventListener('click', function(e) {
+e.stopPropagation();
+});
+filterStatusDropdown.addEventListener('click', function(e) {
+e.stopPropagation();
+});
+sortDropdown.addEventListener('click', function(e) {
+e.stopPropagation();
+});
+// Create Room Modal
+const createRoomModal = document.getElementById('createRoomModal');
+const createRoomBtn = document.querySelector('.glow-button');
+const closeCreateRoomBtn = document.getElementById('closeCreateRoomBtn');
+const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+const confirmCreateBtn = document.getElementById('confirmCreateBtn');
+const privateRoomToggle = document.getElementById('privateRoom');
+const privateCodeSection = document.getElementById('privateCodeSection');
+const modalContent = createRoomModal.querySelector('.bg-[#0f1631]');
+function showModal() {
+createRoomModal.classList.remove('hidden');
+createRoomModal.classList.add('flex');
+// Animate modal in
+setTimeout(() => {
+modalContent.classList.remove('scale-95', 'opacity-0');
+modalContent.classList.add('scale-100', 'opacity-100');
+}, 10);
+}
+function hideModal() {
+modalContent.classList.remove('scale-100', 'opacity-100');
+modalContent.classList.add('scale-95', 'opacity-0');
+setTimeout(() => {
+createRoomModal.classList.remove('flex');
+createRoomModal.classList.add('hidden');
+}, 300);
+}
+createRoomBtn.addEventListener('click', showModal);
+closeCreateRoomBtn.addEventListener('click', hideModal);
+cancelCreateBtn.addEventListener('click', hideModal);
+// Handle private room toggle
+privateRoomToggle.addEventListener('change', function() {
+if (this.checked) {
+privateCodeSection.classList.remove('hidden');
+} else {
+privateCodeSection.classList.add('hidden');
+}
+});
+// Close modal when clicking outside
+createRoomModal.addEventListener('click', function(e) {
+if (e.target === createRoomModal) {
+hideModal();
+}
+});
+// Prevent modal close when clicking modal content
+modalContent.addEventListener('click', function(e) {
+e.stopPropagation();
+});
+// Create room functionality
+confirmCreateBtn.addEventListener('click', function() {
+// Here you would typically create the room via API
+hideModal();
+// Show a success message or redirect to the new room
+// For now, we'll just close the modal
+});
+// Sort dropdown functionality
+const sortOptions = sortDropdown.querySelectorAll('button');
+sortOptions.forEach(option => {
+option.addEventListener('click', function() {
+sortBtn.querySelector('span').textContent = 'Sort: ' + this.textContent;
+sortDropdown.classList.add('hidden');
+});
+});
+});
+</script>
+</body>
+</html>

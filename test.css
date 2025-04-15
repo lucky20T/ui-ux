@@ -1,0 +1,46 @@
+div{
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 95px;
+    height: 100%;
+    background: linear-gradient(45deg, #f06, transparent 50%);
+    border-radius:8px ;
+
+}
+div a:nth-child(1):hover{
+    background: linear-gradient(45deg, #f06, transparent 50%);
+    border-radius:8px ;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    margin: 5px 0;
+    transition: all 0.3s ease-in-out;
+    transform: translateY(-5px);
+
+}
+div a:nth-child(2):hover{
+    background: linear-gradient(45deg, #f06, transparent 50%);
+    border-radius:8px ;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    margin: 5px 0;
+    transition: all 0.3s ease-in-out;
+    transform: translateY(-5px);
+
+}
+div a:nth-child(3):hover{
+    background: linear-gradient(45deg, #f06, transparent 50%);
+    border-radius:8px ;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    margin: 5px 0;
+    transition: all 0.3s ease-in-out;
+    transform: translateY(-5px);
+
+}

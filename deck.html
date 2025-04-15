@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula Cards - Deck Builder</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#6e00ff',secondary:'#00e5ff'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Roboto', sans-serif;
+background-color: #050b1f;
+color: #e0e0ff;
+overflow-x: hidden;
+}
+h1, h2, h3, h4, h5, h6 {
+font-family: 'Orbitron', sans-serif;
+}
+.neon-border {
+box-shadow: 0 0 5px #6e00ff, 0 0 10px rgba(110, 0, 255, 0.5);
+}
+.neon-text {
+text-shadow: 0 0 5px #6e00ff, 0 0 10px rgba(110, 0, 255, 0.5);
+}
+.cyan-neon {
+box-shadow: 0 0 5px #00e5ff, 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.cyan-neon-text {
+text-shadow: 0 0 5px #00e5ff, 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.gradient-bg {
+background: linear-gradient(135deg, #050b1f 0%, #0f1631 100%);
+}
+.card-gradient {
+background: linear-gradient(135deg, #1a1a40 0%, #0f1631 100%);
+}
+.hero-gradient {
+background: linear-gradient(135deg, rgba(5, 11, 31, 0.7) 0%, rgba(15, 22, 49, 0.7) 100%);
+}
+.glow-button {
+position: relative;
+z-index: 1;
+overflow: hidden;
+}
+.glow-button::after {
+content: '';
+position: absolute;
+top: -2px;
+left: -2px;
+right: -2px;
+bottom: -2px;
+z-index: -1;
+background: linear-gradient(90deg, #6e00ff, #00e5ff, #6e00ff);
+background-size: 200%;
+border-radius: 10px;
+animation: glowing 3s linear infinite;
+}
+@keyframes glowing {
+0% { background-position: 0%; }
+100% { background-position: 200%; }
+}
+.card {
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+transform: translateY(-5px) scale(1.02);
+box-shadow: 0 0 15px rgba(110, 0, 255, 0.5);
+}
+.game-card {
+transition: transform 0.5s ease, box-shadow 0.5s ease;
+transform-style: preserve-3d;
+}
+.game-card:hover {
+transform: rotateY(10deg) translateY(-10px);
+box-shadow: -10px 10px 20px rgba(0, 229, 255, 0.3);
+}
+.legendary {
+background: linear-gradient(135deg, #ff9d00 0%, #ff6c00 100%);
+}
+.rare {
+background: linear-gradient(135deg, #00a3ff 0%, #0057ff 100%);
+}
+.uncommon {
+background: linear-gradient(135deg, #00ff88 0%, #00a347 100%);
+}
+.common {
+background: linear-gradient(135deg, #a0a0a0 0%, #606060 100%);
+}
+.custom-scrollbar::-webkit-scrollbar {
+width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+background: #0f1631;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+background: #6e00ff;
+border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+background: #8833ff;
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 60px;
+height: 30px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.switch-slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #1a1a40;
+transition: .4s;
+border-radius: 34px;
+}
+.switch-slider:before {
+position: absolute;
+content: "";
+height: 22px;
+width: 22px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .switch-slider {
+background-color: #6e00ff;
+}
+input:checked + .switch-slider:before {
+transform: translateX(30px);
+}
+input[type="range"] {
+-webkit-appearance: none;
+width: 100%;
+height: 6px;
+background: #1a1a40;
+border-radius: 5px;
+outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 18px;
+height: 18px;
+background: #6e00ff;
+border-radius: 50%;
+cursor: pointer;
+box-shadow: 0 0 5px rgba(110, 0, 255, 0.8);
+}
+input[type="range"]::-moz-range-thumb {
+width: 18px;
+height: 18px;
+background: #6e00ff;
+border-radius: 50%;
+cursor: pointer;
+box-shadow: 0 0 5px rgba(110, 0, 255, 0.8);
+border: none;
+}
+.custom-radio {
+display: flex;
+align-items: center;
+position: relative;
+cursor: pointer;
+user-select: none;
+}
+.custom-radio input {
+position: absolute;
+opacity: 0;
+cursor: pointer;
+}
+.radio-mark {
+position: relative;
+height: 20px;
+width: 20px;
+background-color: #1a1a40;
+border-radius: 50%;
+margin-right: 10px;
+}
+.custom-radio:hover .radio-mark {
+background-color: #252550;
+}
+.custom-radio input:checked ~ .radio-mark {
+background-color: #1a1a40;
+border: 2px solid #6e00ff;
+}
+.radio-mark:after {
+content: "";
+position: absolute;
+display: none;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: #6e00ff;
+box-shadow: 0 0 5px rgba(110, 0, 255, 0.8);
+}
+.custom-radio input:checked ~ .radio-mark:after {
+display: block;
+}
+.custom-checkbox {
+display: flex;
+align-items: center;
+position: relative;
+cursor: pointer;
+user-select: none;
+}
+.custom-checkbox input {
+position: absolute;
+opacity: 0;
+cursor: pointer;
+}
+.checkbox-mark {
+position: relative;
+height: 20px;
+width: 20px;
+background-color: #1a1a40;
+border-radius: 4px;
+margin-right: 10px;
+}
+.custom-checkbox:hover .checkbox-mark {
+background-color: #252550;
+}
+.custom-checkbox input:checked ~ .checkbox-mark {
+background-color: #6e00ff;
+}
+.checkbox-mark:after {
+content: "";
+position: absolute;
+display: none;
+left: 7px;
+top: 3px;
+width: 6px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.custom-checkbox input:checked ~ .checkbox-mark:after {
+display: block;
+}
+.parallax-stars {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: url('https://readdy.ai/api/search-image?query=deep%2520space%2520stars%2520with%2520small%2520glowing%2520particles%252C%2520cosmic%2520dust%252C%2520starfield%252C%2520dark%2520blue%2520and%2520purple%2520nebula%252C%2520high%2520resolution%2520space%2520background&width=1920&height=1080&seq=stars1&orientation=landscape') center/cover no-repeat;
+z-index: -1;
+opacity: 0.4;
+}
+.nav-item {
+position: relative;
+}
+.nav-item::after {
+content: '';
+position: absolute;
+width: 0;
+height: 2px;
+bottom: -2px;
+left: 50%;
+background: #6e00ff;
+transition: all 0.3s ease;
+transform: translateX(-50%);
+}
+.nav-item:hover::after, .nav-item.active::after {
+width: 100%;
+}
+.tab-button {
+position: relative;
+overflow: hidden;
+}
+.tab-button::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(110, 0, 255, 0.2), transparent);
+transform: translateX(-100%);
+transition: transform 0.6s ease;
+}
+.tab-button:hover::before {
+transform: translateX(100%);
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+input[type="number"] {
+-moz-appearance: textfield;
+}
+.draggable-card {
+cursor: grab;
+}
+.draggable-card:active {
+cursor: grabbing;
+}
+.deck-slot {
+transition: all 0.2s ease;
+}
+.deck-slot.highlight {
+background-color: rgba(110, 0, 255, 0.2);
+border-color: #6e00ff;
+}
+.filter-dropdown {
+position: absolute;
+top: 100%;
+right: 0;
+width: 200px;
+background-color: #1a1a40;
+border: 1px solid #2a2a5a;
+border-radius: 8px;
+z-index: 50;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+opacity: 0;
+visibility: hidden;
+transform: translateY(10px);
+transition: all 0.3s ease;
+}
+.filter-dropdown.show {
+opacity: 1;
+visibility: visible;
+transform: translateY(0);
+}
+.collection-card {
+transition: all 0.2s ease;
+}
+.collection-card.selected {
+border-color: #6e00ff;
+box-shadow: 0 0 8px rgba(110, 0, 255, 0.8);
+}
+</style>
+</head>
+<body>
+<div class="parallax-stars"></div>
+<header class="w-full bg-opacity-80 backdrop-blur-md bg-gradient-to-r from-[#0a0a20] to-[#141432] border-b border-[#2a2a5a] sticky top-0 z-50">
+<div class="container mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-10 h-10 flex items-center justify-center">
+<i class="ri-gamepad-fill ri-2x text-primary"></i>
+</div>
+<h1 class="text-2xl font-['Pacifico'] text-white neon-text">logo</h1>
+</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a href="home.html" data-readdy="true" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Home</a>
+<a href="game.html" data-readdy="true" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Game Lobby</a>
+<a href="#" class="nav-item text-white font-medium text-sm uppercase tracking-wider active">Deck Builder</a>
+<a href="#" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Leaderboards</a>
+<a href="#" class="nav-item text-gray-300 hover:text-white font-medium text-sm uppercase tracking-wider">Profile</a>
+</nav>
+<div class="flex items-center space-x-4">
+<div class="hidden md:flex items-center space-x-1">
+<div class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] rounded-full">
+<i class="ri-coin-line text-yellow-400"></i>
+</div>
+<span class="text-yellow-400 font-medium">2,450</span>
+</div>
+<div class="relative">
+<button class="flex items-center space-x-2 bg-[#1a1a40] rounded-full py-1 px-3 hover:bg-[#252550] transition-all duration-300">
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary">
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520cyberpunk%2520character%2520portrait%252C%2520holographic%2520visor%252C%2520neon%2520lights%252C%2520detailed%2520face%252C%2520sci-fi%252C%2520high%2520tech%252C%2520digital%2520art%2520style&width=100&height=100&seq=avatar1&orientation=squarish" alt="Avatar" class="w-full h-full object-cover">
+</div>
+<span class="hidden md:inline text-sm font-medium">NebulaMaster</span>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+<button class="md:hidden w-10 h-10 flex items-center justify-center">
+<i class="ri-menu-line ri-2x"></i>
+</button>
+</div>
+</div>
+</header>
+<main class="min-h-screen py-6">
+<div class="container mx-auto px-4">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center space-x-4">
+<a href="https://readdy.ai/home/6c7fd302-d01e-46b1-97bb-e5d5f6adfb7f/dd2fab2c-81cd-4426-9131-1c61da0af861" data-readdy="true" class="flex items-center space-x-2 text-gray-300 hover:text-white transition-all duration-300">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-arrow-left-line"></i>
+</div>
+<span>Back to Home</span>
+</a>
+</div>
+<div class="flex items-center space-x-3">
+<button id="loadDeckBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+<div class="flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-folder-open-line"></i>
+</div>
+<span>Load Deck</span>
+</div>
+</button>
+<button id="newDeckBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+<div class="flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>New Deck</span>
+</div>
+</button>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-6">
+<!-- Collection Browser (Left Panel) -->
+<div class="lg:w-1/4 bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-4">
+<h2 class="text-xl font-bold mb-4 cyan-neon-text">Card Collection</h2>
+<div class="flex items-center space-x-2 mb-4">
+<div class="relative flex-grow">
+<input type="text" id="searchCards" placeholder="Search cards..." class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 pl-4 pr-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary">
+<div class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+<i class="ri-search-line text-gray-500"></i>
+</div>
+</div>
+<div class="relative">
+<button id="filterBtn" class="w-10 h-10 flex items-center justify-center bg-[#1a1a40] border border-[#2a2a5a] rounded-button hover:bg-[#252550] transition-all duration-300">
+<i class="ri-filter-3-line text-gray-300"></i>
+</button>
+<div id="filterDropdown" class="filter-dropdown p-4">
+<h3 class="text-sm font-bold mb-3">Filter Cards</h3>
+<div class="mb-4">
+<h4 class="text-xs font-medium mb-2 text-gray-300">Card Type</h4>
+<div class="space-y-2">
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Units</span>
+</label>
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Spells</span>
+</label>
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Structures</span>
+</label>
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Artifacts</span>
+</label>
+</div>
+</div>
+<div class="mb-4">
+<h4 class="text-xs font-medium mb-2 text-gray-300">Rarity</h4>
+<div class="space-y-2">
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Common</span>
+</label>
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Uncommon</span>
+</label>
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Rare</span>
+</label>
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkbox-mark"></span>
+<span class="text-sm">Legendary</span>
+</label>
+</div>
+</div>
+<div class="mb-4">
+<h4 class="text-xs font-medium mb-2 text-gray-300">Energy Cost</h4>
+<div class="px-2">
+<input type="range" min="0" max="10" value="10" class="mb-2">
+<div class="flex justify-between text-xs text-gray-400">
+<span>0</span>
+<span>10+</span>
+</div>
+</div>
+</div>
+<div class="flex justify-end">
+<button class="bg-primary hover:bg-opacity-90 text-white py-1 px-4 rounded-button text-xs transition-all duration-300 whitespace-nowrap">
+Apply Filters
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center space-x-2">
+<span class="text-xs text-gray-400">Sort by:</span>
+<button id="sortDropdownBtn" class="bg-[#1a1a40] text-sm text-gray-300 py-1 px-2 rounded-md flex items-center space-x-1">
+<span>Energy</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+<span class="text-xs text-gray-400">248 cards</span>
+</div>
+<div id="cardCollection" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar">
+<!-- Card 1 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="1" data-card-name="Astral Vanguard" data-card-type="Unit" data-card-rarity="legendary" data-card-energy="7">
+<div class="h-1 bg-legendary"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520cosmic%2520warrior%2520character%2520card%2520art%252C%2520glowing%2520energy%2520weapons%252C%2520sci-fi%2520armor%2520with%2520neon%2520details%252C%2520space%2520background%2520with%2520nebula%252C%2520high%2520detail%2520digital%2520illustration%252C%2520fantasy%2520card%2520game%2520art%2520style&width=200&height=240&seq=card1&orientation=portrait" alt="Astral Vanguard" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Astral Vanguard</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">7</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>8</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>6</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="2" data-card-name="Nova Blade" data-card-type="Unit" data-card-rarity="rare" data-card-energy="4">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520space%2520warrior%2520with%2520energy%2520sword%252C%2520sci-fi%2520armor%252C%2520blue%2520glow%2520effects%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration%2520on%2520dark%2520background&width=200&height=240&seq=card2&orientation=portrait" alt="Nova Blade" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Nova Blade</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">4</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>5</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>3</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="3" data-card-name="Void Entity" data-card-type="Unit" data-card-rarity="legendary" data-card-energy="8">
+<div class="h-1 bg-legendary"></div>
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520entity%2520with%2520energy%2520tentacles%252C%2520space%2520background%252C%2520orange%2520and%2520gold%2520energy%2520effects%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=200&height=240&seq=card3&orientation=portrait" alt="Void Entity" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Void Entity</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">8</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>9</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>7</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="4" data-card-name="Mech Drone" data-card-type="Unit" data-card-rarity="uncommon" data-card-energy="3">
+<div class="h-1 bg-uncommon"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520robot%2520drone%2520with%2520glowing%2520green%2520elements%252C%2520mechanical%2520details%252C%2520sci-fi%2520design%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520illustration&width=200&height=240&seq=card4&orientation=portrait" alt="Mech Drone" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Mech Drone</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">3</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>3</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="5" data-card-name="Shield Generator" data-card-type="Structure" data-card-rarity="common" data-card-energy="2">
+<div class="h-1 bg-common"></div>
+<img src="https://readdy.ai/api/search-image?query=energy%2520shield%2520generator%252C%2520sci-fi%2520technology%252C%2520blue%2520force%2520field%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520tech%2520illustration&width=200&height=240&seq=card5&orientation=portrait" alt="Shield Generator" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Shield Generator</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">2</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Structure</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>4</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="6" data-card-name="Astral Mage" data-card-type="Unit" data-card-rarity="rare" data-card-energy="5">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=space%2520sorceress%2520with%2520purple%2520magic%252C%2520cosmic%2520powers%252C%2520glowing%2520runes%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=200&height=240&seq=card6&orientation=portrait" alt="Astral Mage" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Astral Mage</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">5</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>4</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>3</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 7 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="7" data-card-name="Energy Surge" data-card-type="Spell" data-card-rarity="uncommon" data-card-energy="3">
+<div class="h-1 bg-uncommon"></div>
+<img src="https://readdy.ai/api/search-image?query=energy%2520blast%2520spell%252C%2520purple%2520and%2520blue%2520magic%2520explosion%252C%2520power%2520surge%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520spell%2520illustration&width=200&height=240&seq=card7&orientation=portrait" alt="Energy Surge" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Energy Surge</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">3</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Spell</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-magic-line text-purple-500 text-xs"></i>
+</div>
+<span>Damage 4</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 8 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="8" data-card-name="Quantum Shifter" data-card-type="Unit" data-card-rarity="rare" data-card-energy="4">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520teleporting%2520assassin%252C%2520phase%2520shifting%2520technology%252C%2520energy%2520trails%252C%2520sci-fi%2520armor%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=200&height=240&seq=card16&orientation=portrait" alt="Quantum Shifter" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Quantum Shifter</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">4</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>6</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 9 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="9" data-card-name="Nebula Fortress" data-card-type="Structure" data-card-rarity="rare" data-card-energy="6">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=massive%2520space%2520station%2520fortress%252C%2520defensive%2520shields%252C%2520weapon%2520arrays%252C%2520sci-fi%2520architecture%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520structure%2520illustration&width=200&height=240&seq=card17&orientation=portrait" alt="Nebula Fortress" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Nebula Fortress</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">6</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Structure</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>8</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 10 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="10" data-card-name="Cosmic Warp" data-card-type="Spell" data-card-rarity="uncommon" data-card-energy="2">
+<div class="h-1 bg-uncommon"></div>
+<img src="https://readdy.ai/api/search-image?query=space%2520time%2520warp%2520portal%252C%2520cosmic%2520energy%2520vortex%252C%2520dimensional%2520rift%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520spell%2520illustration&width=200&height=240&seq=card18&orientation=portrait" alt="Cosmic Warp" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Cosmic Warp</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">2</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Spell</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-magic-line text-purple-500 text-xs"></i>
+</div>
+<span>Teleport</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 11 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="11" data-card-name="Galactic Titan" data-card-type="Unit" data-card-rarity="legendary" data-card-energy="9">
+<div class="h-1 bg-legendary"></div>
+<img src="https://readdy.ai/api/search-image?query=massive%2520cosmic%2520titan%2520entity%252C%2520planet-sized%2520being%252C%2520energy%2520aura%252C%2520space%2520background%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=200&height=240&seq=card19&orientation=portrait" alt="Galactic Titan" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Galactic Titan</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">9</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>10</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>10</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 12 -->
+<div class="collection-card game-card bg-[#0f1631] rounded-md overflow-hidden border border-[#2a2a5a] cursor-move draggable-card" data-card-id="12" data-card-name="Stellar Scout" data-card-type="Unit" data-card-rarity="common" data-card-energy="1">
+<div class="h-1 bg-common"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520scout%2520with%2520stealth%2520tech%252C%2520reconnaissance%2520equipment%252C%2520light%2520armor%252C%2520sci-fi%2520design%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=200&height=240&seq=card20&orientation=portrait" alt="Stellar Scout" class="w-full h-32 object-cover object-top">
+<div class="p-2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="text-xs font-medium truncate">Stellar Scout</h3>
+<div class="w-5 h-5 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs">1</div>
+</div>
+<div class="flex items-center justify-between text-xs text-gray-400">
+<span>Unit</span>
+<div class="flex items-center space-x-1">
+<div class="w-3 h-3 flex items-center justify-center">
+<i class="ri-sword-line text-red-500 text-xs"></i>
+</div>
+<span>1</span>
+<div class="w-3 h-3 flex items-center justify-center ml-1">
+<i class="ri-shield-line text-blue-500 text-xs"></i>
+</div>
+<span>1</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Deck Building Area (Center Panel) -->
+<div class="lg:w-1/2 bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex-grow">
+<input type="text" id="deckName" value="Cosmic Destroyer" placeholder="Deck Name" class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary">
+</div>
+<div class="ml-4 flex items-center space-x-2">
+<button class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] border border-[#2a2a5a] rounded-md hover:bg-[#252550] transition-all duration-300">
+<i class="ri-save-line text-gray-300"></i>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] border border-[#2a2a5a] rounded-md hover:bg-[#252550] transition-all duration-300">
+<i class="ri-share-line text-gray-300"></i>
+</button>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-medium">Deck Cards <span id="deckCount" class="text-primary">18</span>/30</h3>
+<div class="flex items-center space-x-2">
+<button id="viewGrid" class="w-8 h-8 flex items-center justify-center bg-primary rounded-md">
+<i class="ri-grid-line text-white"></i>
+</button>
+<button id="viewList" class="w-8 h-8 flex items-center justify-center bg-[#1a1a40] border border-[#2a2a5a] rounded-md hover:bg-[#252550] transition-all duration-300">
+<i class="ri-list-check text-gray-300"></i>
+</button>
+</div>
+</div>
+<div id="deckGrid" class="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6 gap-2 h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar p-2 bg-[#0a0a20] rounded-lg">
+<!-- Deck Card 1 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="1" data-card-count="2">
+<div class="h-1 bg-legendary"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520cosmic%2520warrior%2520character%2520card%2520art%252C%2520glowing%2520energy%2520weapons%252C%2520sci-fi%2520armor%2520with%2520neon%2520details%252C%2520space%2520background%2520with%2520nebula%252C%2520high%2520detail%2520digital%2520illustration%252C%2520fantasy%2520card%2520game%2520art%2520style&width=120&height=160&seq=card1&orientation=portrait" alt="Astral Vanguard" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">7</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 2 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="2" data-card-count="3">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520space%2520warrior%2520with%2520energy%2520sword%252C%2520sci-fi%2520armor%252C%2520blue%2520glow%2520effects%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration%2520on%2520dark%2520background&width=120&height=160&seq=card2&orientation=portrait" alt="Nova Blade" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">4</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">3</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 3 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="3" data-card-count="1">
+<div class="h-1 bg-legendary"></div>
+<img src="https://readdy.ai/api/search-image?query=cosmic%2520entity%2520with%2520energy%2520tentacles%252C%2520space%2520background%252C%2520orange%2520and%2520gold%2520energy%2520effects%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=120&height=160&seq=card3&orientation=portrait" alt="Void Entity" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">8</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">1</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 4 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="4" data-card-count="2">
+<div class="h-1 bg-uncommon"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520robot%2520drone%2520with%2520glowing%2520green%2520elements%252C%2520mechanical%2520details%252C%2520sci-fi%2520design%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520illustration&width=120&height=160&seq=card4&orientation=portrait" alt="Mech Drone" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">3</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 5 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="5" data-card-count="2">
+<div class="h-1 bg-common"></div>
+<img src="https://readdy.ai/api/search-image?query=energy%2520shield%2520generator%252C%2520sci-fi%2520technology%252C%2520blue%2520force%2520field%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520tech%2520illustration&width=120&height=160&seq=card5&orientation=portrait" alt="Shield Generator" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 6 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="6" data-card-count="2">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=space%2520sorceress%2520with%2520purple%2520magic%252C%2520cosmic%2520powers%252C%2520glowing%2520runes%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=120&height=160&seq=card6&orientation=portrait" alt="Astral Mage" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">5</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 7 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="7" data-card-count="2">
+<div class="h-1 bg-uncommon"></div>
+<img src="https://readdy.ai/api/search-image?query=energy%2520blast%2520spell%252C%2520purple%2520and%2520blue%2520magic%2520explosion%252C%2520power%2520surge%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520spell%2520illustration&width=120&height=160&seq=card7&orientation=portrait" alt="Energy Surge" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">3</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 8 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="8" data-card-count="2">
+<div class="h-1 bg-rare"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520teleporting%2520assassin%252C%2520phase%2520shifting%2520technology%252C%2520energy%2520trails%252C%2520sci-fi%2520armor%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=120&height=160&seq=card16&orientation=portrait" alt="Quantum Shifter" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">4</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Deck Card 9 -->
+<div class="deck-slot game-card bg-[#1a1a40] rounded-md overflow-hidden border border-[#2a2a5a] relative" data-card-id="12" data-card-count="2">
+<div class="h-1 bg-common"></div>
+<img src="https://readdy.ai/api/search-image?query=futuristic%2520scout%2520with%2520stealth%2520tech%252C%2520reconnaissance%2520equipment%252C%2520light%2520armor%252C%2520sci-fi%2520design%252C%2520card%2520game%2520art%2520style%252C%2520detailed%2520character%2520illustration&width=120&height=160&seq=card20&orientation=portrait" alt="Stellar Scout" class="w-full h-20 object-cover object-top">
+<div class="absolute top-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">1</div>
+<div class="absolute bottom-1 right-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs">2</div>
+<button class="absolute top-1 left-1 bg-[#00000080] w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-500 transition-all duration-300">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<!-- Empty Deck Slots -->
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+<div class="deck-slot bg-[#0f1631] rounded-md border border-dashed border-[#2a2a5a] h-24 flex items-center justify-center">
+<span class="text-xs text-gray-500">Drop card here</span>
+</div>
+</div>
+<div id="deckList" class="hidden h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar p-2 bg-[#0a0a20] rounded-lg">
+<table class="w-full">
+<thead>
+<tr class="text-left border-b border-[#2a2a5a]">
+<th class="py-2 px-3 text-xs font-medium text-gray-300">Name</th>
+<th class="py-2 px-3 text-xs font-medium text-gray-300">Type</th>
+<th class="py-2 px-3 text-xs font-medium text-gray-300 text-center">Energy</th>
+<th class="py-2 px-3 text-xs font-medium text-gray-300 text-center">Count</th>
+<th class="py-2 px-3 text-xs font-medium text-gray-300"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-legendary mr-2"></div>
+<span class="text-sm">Astral Vanguard</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Unit</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">7</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">2</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-rare mr-2"></div>
+<span class="text-sm">Nova Blade</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Unit</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">4</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">3</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-legendary mr-2"></div>
+<span class="text-sm">Void Entity</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Unit</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">8</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">1</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-uncommon mr-2"></div>
+<span class="text-sm">Mech Drone</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Unit</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">3</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">2</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-common mr-2"></div>
+<span class="text-sm">Shield Generator</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Structure</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">2</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">2</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-rare mr-2"></div>
+<span class="text-sm">Astral Mage</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Unit</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">5</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">2</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-uncommon mr-2"></div>
+<span class="text-sm">Energy Surge</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Spell</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">3</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">2</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-rare mr-2"></div>
+<span class="text-sm">Quantum Shifter</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Unit</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">4</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">2</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#2a2a5a] hover:bg-[#1a1a40]">
+<td class="py-2 px-3">
+<div class="flex items-center">
+<div class="w-1 h-6 bg-common mr-2"></div>
+<span class="text-sm">Stellar Scout</span>
+</div>
+</td>
+<td class="py-2 px-3 text-sm text-gray-400">Unit</td>
+<td class="py-2 px-3 text-center">
+<div class="w-6 h-6 flex items-center justify-center bg-primary bg-opacity-20 rounded-full text-xs mx-auto">1</div>
+</td>
+<td class="py-2 px-3 text-center text-sm">2</td>
+<td class="py-2 px-3 text-right">
+<button class="text-gray-400 hover:text-red-500">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Deck Statistics (Right Panel) -->
+<div class="lg:w-1/4 bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-4">
+<h2 class="text-xl font-bold mb-4 cyan-neon-text">Deck Statistics</h2>
+<div class="space-y-6">
+<div>
+<h3 class="text-sm font-medium mb-2 text-gray-300">Energy Curve</h3>
+<div class="h-40" id="energyCurveChart"></div>
+</div>
+<div>
+<h3 class="text-sm font-medium mb-2 text-gray-300">Card Types</h3>
+<div class="h-40" id="cardTypesChart"></div>
+</div>
+<div>
+<h3 class="text-sm font-medium mb-2 text-gray-300">Deck Power</h3>
+<div class="flex items-center space-x-3 mb-2">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-sword-line text-red-500"></i>
+</div>
+<div class="flex-grow">
+<div class="h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-red-500" style="width: 70%"></div>
+</div>
+</div>
+<span class="text-sm">7.0</span>
+</div>
+<div class="flex items-center space-x-3 mb-2">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-shield-line text-blue-500"></i>
+</div>
+<div class="flex-grow">
+<div class="h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-blue-500" style="width: 60%"></div>
+</div>
+</div>
+<span class="text-sm">6.0</span>
+</div>
+<div class="flex items-center space-x-3">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-magic-line text-purple-500"></i>
+</div>
+<div class="flex-grow">
+<div class="h-2 bg-[#1a1a40] rounded-full overflow-hidden">
+<div class="h-full bg-purple-500" style="width: 40%"></div>
+</div>
+</div>
+<span class="text-sm">4.0</span>
+</div>
+</div>
+<div>
+<h3 class="text-sm font-medium mb-2 text-gray-300">Synergy Analysis</h3>
+<div class="bg-[#1a1a40] rounded-lg p-3">
+<div class="flex items-center justify-between mb-2">
+<span class="text-sm">Combat Synergy</span>
+<div class="flex">
+<div class="w-4 h-4 bg-primary rounded-full"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+</div>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-sm">Defensive Synergy</span>
+<div class="flex">
+<div class="w-4 h-4 bg-primary rounded-full"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+</div>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-sm">Spell Synergy</span>
+<div class="flex">
+<div class="w-4 h-4 bg-primary rounded-full"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm">Energy Efficiency</span>
+<div class="flex">
+<div class="w-4 h-4 bg-primary rounded-full"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-primary rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+<div class="w-4 h-4 bg-[#1a1a40] border border-[#2a2a5a] rounded-full -ml-1"></div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h3 class="text-sm font-medium mb-2 text-gray-300">Deck Rating</h3>
+<div class="flex items-center justify-between bg-[#1a1a40] rounded-lg p-3">
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-star-fill text-yellow-400"></i>
+</div>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-star-fill text-yellow-400"></i>
+</div>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-star-fill text-yellow-400"></i>
+</div>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-star-half-fill text-yellow-400"></i>
+</div>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-star-line text-gray-500"></i>
+</div>
+</div>
+<span class="text-xl font-bold">3.5</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 bg-[#0a0a20] border-t border-[#2a2a5a] py-3 px-4 z-40">
+<div class="container mx-auto flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center space-x-2">
+<span class="text-sm text-gray-300">Deck Size:</span>
+<span class="text-sm font-medium"><span class="text-primary">18</span>/30</span>
+</div>
+<div class="flex flex-wrap items-center gap-2">
+<button id="saveDeckBtn" class="bg-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+<div class="flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-save-line"></i>
+</div>
+<span>Save Deck</span>
+</div>
+</button>
+<!-- Save Deck Modal -->
+<div id="saveDeckModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+<div class="bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-6 w-96 transform transition-all duration-300 scale-95 opacity-0">
+<h3 class="text-xl font-bold mb-4">Save Deck</h3>
+<div class="space-y-4">
+<div>
+<label for="deckNameInput" class="block text-sm font-medium text-gray-300 mb-1">Deck Name</label>
+<input type="text" id="deckNameInput" class="w-full bg-[#1a1a40] border border-[#2a2a5a] rounded-button py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary" value="Cosmic Destroyer">
+</div>
+<div class="flex items-center space-x-2">
+<label class="custom-radio">
+<input type="radio" name="saveOption" value="overwrite" checked>
+<span class="radio-mark"></span>
+<span class="text-sm">Overwrite existing deck</span>
+</label>
+</div>
+<div class="flex items-center space-x-2">
+<label class="custom-radio">
+<input type="radio" name="saveOption" value="new">
+<span class="radio-mark"></span>
+<span class="text-sm">Save as new deck</span>
+</label>
+</div>
+</div>
+<div class="flex justify-end space-x-3 mt-6">
+<button id="cancelSaveBtn" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300">Cancel</button>
+<button id="confirmSaveBtn" class="bg-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-button text-sm transition-all duration-300">Save</button>
+</div>
+<!-- Success Message -->
+<div id="saveSuccess" class="hidden absolute inset-0 bg-[#0f1631] rounded-lg flex items-center justify-center">
+<div class="text-center">
+<div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-primary bg-opacity-20 rounded-full">
+<i class="ri-check-line text-4xl text-primary"></i>
+</div>
+<p class="text-lg font-medium">Deck Saved Successfully!</p>
+</div>
+</div>
+</div>
+</div>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+<div class="flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-play-circle-line"></i>
+</div>
+<span>Test Deck</span>
+</div>
+</button>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+<div class="flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-share-line"></i>
+</div>
+<span>Share Deck</span>
+</div>
+</button>
+<button class="bg-[#1a1a40] hover:bg-[#252550] text-white py-2 px-4 rounded-button text-sm transition-all duration-300 whitespace-nowrap">
+<div class="flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line"></i>
+</div>
+<span>Clear Deck</span>
+</div>
+</button>
+</div>
+<div class="hidden lg:block"></div>
+</div>
+</div>
+<div id="cardPreview" class="fixed hidden top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#0f1631] border border-[#2a2a5a] rounded-lg p-4 shadow-lg z-50 w-72">
+<div class="relative mb-4">
+<img id="previewImage" src="" alt="Card Preview" class="w-full h-80 object-cover object-top rounded-md">
+<div id="previewRarity" class="absolute top-0 left-0 right-0 h-1"></div>
+<div class="absolute top-2 right-2 bg-[#00000080] w-8 h-8 flex items-center justify-center rounded-full text-lg" id="previewEnergy"></div>
+</div>
+<h3 id="previewName" class="text-xl font-bold mb-1"></h3>
+<div class="flex items-center justify-between mb-3">
+<span id="previewType" class="text-sm text-gray-400"></span>
+<span id="previewRarityText" class="text-sm"></span>
+</div>
+<p id="previewDescription" class="text-sm text-gray-300 mb-4"></p>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-sword-line text-red-500"></i>
+</div>
+<span id="previewAttack"></span>
+</div>
+<div class="flex items-center space-x-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-shield-line text-blue-500"></i>
+</div>
+<span id="previewDefense"></span>
+</div>
+</div>
+<button id="closePreview" class="bg-[#1a1a40] hover:bg-[#252550] text-white py-1 px-3 rounded-button text-xs transition-all duration-300 whitespace-nowrap">
+Close
+</button>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Save Deck Modal Functionality
+const saveDeckBtn = document.getElementById('saveDeckBtn');
+const saveDeckModal = document.getElementById('saveDeckModal');
+const cancelSaveBtn = document.getElementById('cancelSaveBtn');
+const confirmSaveBtn = document.getElementById('confirmSaveBtn');
+const deckNameInput = document.getElementById('deckNameInput');
+const saveSuccess = document.getElementById('saveSuccess');
+const modalContent = saveDeckModal.querySelector('.bg-[#0f1631]');
+function showModal() {
+saveDeckModal.classList.remove('hidden');
+saveDeckModal.classList.add('flex');
+// Get current deck name
+const currentDeckName = document.getElementById('deckName').value;
+deckNameInput.value = currentDeckName;
+// Animate modal in
+setTimeout(() => {
+modalContent.classList.remove('scale-95', 'opacity-0');
+modalContent.classList.add('scale-100', 'opacity-100');
+}, 10);
+}
+function hideModal() {
+modalContent.classList.remove('scale-100', 'opacity-100');
+modalContent.classList.add('scale-95', 'opacity-0');
+setTimeout(() => {
+saveDeckModal.classList.remove('flex');
+saveDeckModal.classList.add('hidden');
+saveSuccess.classList.add('hidden');
+}, 300);
+}
+function showSuccessMessage() {
+saveSuccess.classList.remove('hidden');
+setTimeout(() => {
+hideModal();
+// Update deck name in the main interface
+document.getElementById('deckName').value = deckNameInput.value;
+}, 1500);
+}
+saveDeckBtn.addEventListener('click', showModal);
+cancelSaveBtn.addEventListener('click', hideModal);
+confirmSaveBtn.addEventListener('click', () => {
+// Here you would typically save the deck to your backend
+// For now, we'll just show the success message
+showSuccessMessage();
+});
+// Close modal when clicking outside
+saveDeckModal.addEventListener('click', (e) => {
+if (e.target === saveDeckModal) {
+hideModal();
+}
+});
+// Prevent modal close when clicking modal content
+modalContent.addEventListener('click', (e) => {
+e.stopPropagation();
+});
+// Initialize energy curve chart
+const energyCurveChart = echarts.init(document.getElementById('energyCurveChart'));
+const energyCurveOption = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.8)',
+textStyle: {
+color: '#1f2937'
+}
+},
+grid: {
+top: 10,
+right: 0,
+bottom: 20,
+left: 0
+},
+xAxis: {
+type: 'category',
+data: ['1', '2', '3', '4', '5', '6', '7', '8', '9+'],
+axisLine: {
+show: false
+},
+axisTick: {
+show: false
+},
+axisLabel: {
+color: '#e0e0ff',
+fontSize: 10
+}
+},
+yAxis: {
+type: 'value',
+show: false
+},
+series: [
+{
+name: 'Card Count',
+type: 'bar',
+data: [2, 2, 4, 5, 2, 1, 0, 1, 1],
+itemStyle: {
+color: 'rgba(87, 181, 231, 1)',
+borderRadius: 4
+}
+}
+]
+};
+energyCurveChart.setOption(energyCurveOption);
+// Initialize card types chart
+const cardTypesChart = echarts.init(document.getElementById('cardTypesChart'));
+const cardTypesOption = {
+animation: false,
+tooltip: {
+trigger: 'item',
+backgroundColor: 'rgba(255, 255, 255, 0.8)',
+textStyle: {
+color: '#1f2937'
+}
+},
+legend: {
+orient: 'vertical',
+right: 0,
+top: 'center',
+textStyle: {
+color: '#e0e0ff',
+fontSize: 10
+},
+itemWidth: 10,
+itemHeight: 10
+},
+series: [
+{
+name: 'Card Types',
+type: 'pie',
+radius: ['40%', '70%'],
+center: ['35%', '50%'],
+avoidLabelOverlap: false,
+label: {
+show: false
+},
+emphasis: {
+label: {
+show: false
+}
+},
+labelLine: {
+show: false
+},
+data: [
+{ value: 14, name: 'Units' },
+{ value: 2, name: 'Spells' },
+{ value: 2, name: 'Structures' },
+{ value: 0, name: 'Artifacts' }
+],
+itemStyle: {
+borderRadius: 4
+},
+color: [
+'rgba(87, 181, 231, 1)',
+'rgba(141, 211, 199, 1)',
+'rgba(251, 191, 114, 1)',
+'rgba(252, 141, 98, 1)'
+]
+}
+]
+};
+cardTypesChart.setOption(cardTypesOption);
+// Handle window resize for charts
+window.addEventListener('resize', function() {
+energyCurveChart.resize();
+cardTypesChart.resize();
+});
+// Toggle between grid and list view
+const viewGridBtn = document.getElementById('viewGrid');
+const viewListBtn = document.getElementById('viewList');
+const deckGrid = document.getElementById('deckGrid');
+const deckList = document.getElementById('deckList');
+viewGridBtn.addEventListener('click', function() {
+deckGrid.classList.remove('hidden');
+deckList.classList.add('hidden');
+viewGridBtn.classList.add('bg-primary');
+viewGridBtn.classList.remove('bg-[#1a1a40]', 'border', 'border-[#2a2a5a]', 'hover:bg-[#252550]');
+viewListBtn.classList.remove('bg-primary');
+viewListBtn.classList.add('bg-[#1a1a40]', 'border', 'border-[#2a2a5a]', 'hover:bg-[#252550]');
+});
+viewListBtn.addEventListener('click', function() {
+deckGrid.classList.add('hidden');
+deckList.classList.remove('hidden');
+viewListBtn.classList.add('bg-primary');
+viewListBtn.classList.remove('bg-[#1a1a40]', 'border', 'border-[#2a2a5a]', 'hover:bg-[#252550]');
+viewGridBtn.classList.remove('bg-primary');
+viewGridBtn.classList.add('bg-[#1a1a40]', 'border', 'border-[#2a2a5a]', 'hover:bg-[#252550]');
+});
+// Toggle filter dropdown
+const filterBtn = document.getElementById('filterBtn');
+const filterDropdown = document.getElementById('filterDropdown');
+filterBtn.addEventListener('click', function() {
+filterDropdown.classList.toggle('show');
+});
+// Close filter dropdown when clicking outside
+document.addEventListener('click', function(event) {
+if (!filterBtn.contains(event.target) && !filterDropdown.contains(event.target)) {
+filterDropdown.classList.remove('show');
+}
+});
+// Card preview functionality
+const cardPreview = document.getElementById('cardPreview');
+const closePreview = document.getElementById('closePreview');
+const previewImage = document.getElementById('previewImage');
+const previewName = document.getElementById('previewName');
+const previewType = document.getElementById('previewType');
+const previewRarity = document.getElementById('previewRarity');
+const previewRarityText = document.getElementById('previewRarityText');
+const previewEnergy = document.getElementById('previewEnergy');
+const previewDescription = document.getElementById('previewDescription');
+const previewAttack = document.getElementById('previewAttack');
+const previewDefense = document.getElementById('previewDefense');
+// Card descriptions for preview
+const cardDescriptions = {
+1: "A legendary cosmic warrior with the ability to channel astral energy. Deals splash damage to all adjacent enemy units.",
+2: "A skilled warrior wielding a blade of pure energy. Can attack twice in a single turn.",
+3: "A mysterious entity from the void between galaxies. Consumes enemy units and gains their power.",
+4: "An automated drone designed for reconnaissance and light combat. Can be deployed at no energy cost if you control a Mech Commander.",
+5: "Generates a protective shield that reduces damage to adjacent friendly units by 50%.",
+6: "A powerful spellcaster who harnesses the energy of distant stars. Can cast spells at reduced energy cost.",
+7: "Unleashes a devastating surge of energy that damages all enemy units in a row.",
+8: "A specialized unit that can phase between dimensions. Can bypass enemy units with Stealth.",
+9: "A massive defensive structure that provides cover for your units. Reduces incoming damage by 30%.",
+10: "Creates a wormhole that allows you to teleport a unit to any position on the battlefield.",
+11: "An ancient cosmic entity of immense power. Immune to spells and abilities.",
+12: "A nimble scout unit that can reveal hidden enemies. Draws a card when deployed."
+};
+// Show card preview when clicking on collection cards
+const collectionCards = document.querySelectorAll('.collection-card');
+collectionCards.forEach(card => {
+card.addEventListener('click', function() {
+const cardId = this.getAttribute('data-card-id');
+const cardName = this.getAttribute('data-card-name');
+const cardType = this.getAttribute('data-card-type');
+const cardRarity = this.getAttribute('data-card-rarity');
+const cardEnergy = this.getAttribute('data-card-energy');
+const imgSrc = this.querySelector('img').src;
+// Set preview content
+previewImage.src = imgSrc;
+previewName.textContent = cardName;
+previewType.textContent = cardType;
+previewRarity.className = `absolute top-0 left-0 right-0 h-1 bg-${cardRarity}`;
+previewEnergy.textContent = cardEnergy;
+previewDescription.textContent = cardDescriptions[cardId];
+// Set rarity text with appropriate color
+previewRarityText.textContent = cardRarity.charAt(0).toUpperCase() + cardRarity.slice(1);
+if (cardRarity === 'legendary') {
+previewRarityText.className = 'text-sm text-yellow-500';
+} else if (cardRarity === 'rare') {
+previewRarityText.className = 'text-sm text-blue-500';
+} else if (cardRarity === 'uncommon') {
+previewRarityText.className = 'text-sm text-green-500';
+} else {
+previewRarityText.className = 'text-sm text-gray-400';
+}
+// Set attack and defense if unit or structure
+if (cardType === 'Unit') {
+const attackElement = this.querySelector('.ri-sword-line').parentElement.nextElementSibling;
+const defenseElement = attackElement.nextElementSibling.nextElementSibling;
+previewAttack.textContent = attackElement.textContent;
+previewDefense.textContent = defenseElement.textContent;
+previewAttack.parentElement.classList.remove('hidden');
+previewDefense.parentElement.classList.remove('hidden');
+} else if (cardType === 'Structure') {
+const defenseElement = this.querySelector('.ri-shield-line').parentElement.nextElementSibling;
+previewAttack.textContent = '0';
+previewDefense.textContent = defenseElement.textContent;
+previewAttack.parentElement.classList.remove('hidden');
+previewDefense.parentElement.classList.remove('hidden');
+} else {
+previewAttack.parentElement.classList.add('hidden');
+previewDefense.parentElement.classList.add('hidden');
+}
+// Show preview
+cardPreview.classList.remove('hidden');
+});
+});
+// Close preview when clicking close button
+closePreview.addEventListener('click', function() {
+cardPreview.classList.add('hidden');
+});
+// Close preview when clicking outside
+document.addEventListener('click', function(event) {
+if (!cardPreview.contains(event.target) && !event.target.closest('.collection-card')) {
+cardPreview.classList.add('hidden');
+}
+});
+// Simulate drag and drop functionality
+const draggableCards = document.querySelectorAll('.draggable-card');
+const deckSlots = document.querySelectorAll('.deck-slot');
+draggableCards.forEach(card => {
+card.addEventListener('dragstart', function(e) {
+e.dataTransfer.setData('text/plain', this.getAttribute('data-card-id'));
+setTimeout(() => {
+this.classList.add('opacity-50');
+}, 0);
+});
+card.addEventListener('dragend', function() {
+this.classList.remove('opacity-50');
+});
+});
+deckSlots.forEach(slot => {
+slot.addEventListener('dragover', function(e) {
+e.preventDefault();
+this.classList.add('highlight');
+});
+slot.addEventListener('dragleave', function() {
+this.classList.remove('highlight');
+});
+slot.addEventListener('drop', function(e) {
+e.preventDefault();
+this.classList.remove('highlight');
+const cardId = e.dataTransfer.getData('text/plain');
+console.log(`Card ${cardId} dropped into deck slot`);
+// In a real implementation, this would add the card to the deck
+});
+});
+});
+</script>
+</body>
+</html>
